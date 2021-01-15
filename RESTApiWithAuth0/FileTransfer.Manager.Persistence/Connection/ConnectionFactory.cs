@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace FileTransfer.Manager.Persistence.Connection
 {
     public class ConnectionFactory :
@@ -9,7 +6,6 @@ namespace FileTransfer.Manager.Persistence.Connection
     {
         public IConnection CreateConnection()
         {
-            //return new DatabaseConnection();
             return new ConnectionDummy();
         }
      

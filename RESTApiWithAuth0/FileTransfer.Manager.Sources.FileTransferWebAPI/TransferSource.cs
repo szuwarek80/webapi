@@ -20,13 +20,17 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
         private int _statusRequestInterval;
         public TransferSourceType SourceType =>  TransferSourceType.FileTransferWebAPI;
 
-        public bool IsConnected { get; }
+        public bool IsConnected { get 
+            {
+                if (_fileTransferWebAPIAccess != null)
+                    return _fileTransferWebAPIAccess.IsConnected;
+                return false;
+            } }
 
         public int MaxParallelNumberOfTransferRequests => 2;
 
         public TransferSource(int aStatusRequestInterval)
         {
-            this.IsConnected = true;
             _logger = new Logger<TransferSource>();
             _statusRequestInterval = aStatusRequestInterval;
         }
@@ -58,52 +62,49 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
                 ITransferResult result = null;
                 var client = new HttpClient();
-
-                string url = string.Empty;
-                string transferJobGuid = string.Empty;
+                Guid transferJobGuid = Guid.Empty;
 
                 try
                 {
                     aTransferProgress.Report(aRequest.ID, TransferResultStatus.Started, DateTime.Now);
                     //--- PREPARING FOR TRANSFER REQUEST
                     cancellationToken.ThrowIfCancellationRequested();
+
+                    //--- SENDING CREATE TRANSFER REQUEST
                     aTransferProgress.Report(aRequest.ID, TransferResultStatus.InProgress, DateTime.Now, "Sending the transfer request...");
-
-                    //--- ADD API KEY
-                    //client.DefaultRequestHeaders.Add(ApiKeyAuthenticationHandler.ApiKeyHeaderName, ApiKey.KEY);
-
-                    //--- SENDING POST TO CREATE TRANSFER REQUEST
-                    transferJobGuid = await _fileTransferWebAPIAccess.SendTransferRequest(client, aRequest);
-
-                    //--- SENDING GET TO UPDATE TRANSFER STATUS UNTIL THE STATUS WILL BE SET AS FINISHED
-                    TransferStatusDto finalResult = null;
-
+                    FileTransferDto fileTransfer = await _fileTransferWebAPIAccess.SendTransferCreateRequest(client, aRequest);
+                    transferJobGuid = fileTransfer.TransferRequestID;
+                   
+                    //--- SENDING GET TRANSFER REQUEST TO UPDATE THE TRANSFER SATUS 
                     do
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        TransferStatusDto statusResponse = await _fileTransferWebAPIAccess.SendTransferStatusRequest(client, transferJobGuid);
+                        fileTransfer = await _fileTransferWebAPIAccess.SendTransferGetRequest(client, transferJobGuid);
 
-                        if (statusResponse.Status == TransferResultStatus.Success || statusResponse.Status == TransferResultStatus.Cancelled || statusResponse.Status == TransferResultStatus.Error)
+                        if (fileTransfer.Status == TransferResultStatus.Success)
                         {
-                            finalResult = statusResponse;
+                            aTransferProgress.Report(aRequest.ID, fileTransfer.Status, DateTime.Now, fileTransfer.Result);
+                            break;
+                        }
+                        else if (fileTransfer.Status == TransferResultStatus.Error)
+                        {
+                            aTransferProgress.Report(aRequest.ID, fileTransfer.Status, DateTime.Now, fileTransfer.Description);
                             break;
                         }
 
-                        var statusDescription = string.IsNullOrEmpty(statusResponse.Description) ? "Transfer in progress..." : statusResponse.Description;
-                        aTransferProgress.Report(aRequest.ID, statusResponse.Status, DateTime.Now, statusDescription);
+                        var statusDescription = string.IsNullOrEmpty(fileTransfer.Description) ? "Transfer in progress..." : fileTransfer.Description;
+                        aTransferProgress.Report(aRequest.ID, fileTransfer.Status, DateTime.Now, statusDescription);
 
-                        _logger.LogDebug($"FileTransferWebAPI {_fileTransferWebAPIAccess.ID} updated the transfer {statusResponse.TransferRequestID} progress: {statusResponse.Status}, {statusDescription}.");
+                        _logger.LogDebug($"FileTransferWebAPI {_fileTransferWebAPIAccess.ID} updated the transfer {fileTransfer.TransferRequestID} progress: {fileTransfer.Status}, {statusDescription}.");
 
                         await Task.Delay(_statusRequestInterval, cancellationToken);
 
                     } while (true);
 
-                    aTransferProgress.Report(aRequest.ID, finalResult.Status, DateTime.Now, finalResult.Description);
-
                     _logger.LogDebug($"FileTransferWebAPI {_fileTransferWebAPIAccess.ID} finished successfully the transfer {aRequest.ID}.");
 
-                    result = new TransferResult(aRequest.ID, finalResult.Status, DateTime.Now, finalResult.Description);
+                    result = new TransferResult(aRequest.ID, fileTransfer.Status, DateTime.Now, fileTransfer.Result);
 
                     try
                     {
@@ -116,31 +117,31 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                 }
                 catch (OperationCanceledException)
                 {
-                    if (!string.IsNullOrEmpty(transferJobGuid))
+                    if (transferJobGuid != Guid.Empty)
                     {
-                        await _fileTransferWebAPIAccess.SendTransferCancelRequest(client, transferJobGuid);
+                        await _fileTransferWebAPIAccess.SendTransferDeleteRequest(client, transferJobGuid);
                     }
 
-                    aTransferProgress.Report(aRequest.ID, TransferResultStatus.Cancelled, DateTime.Now, aCancellationToken.CancellationReason);
+                    aTransferProgress.Report(aRequest.ID, TransferResultStatus.Error, DateTime.Now, aCancellationToken.CancellationReason);
 
                     _logger.LogDebug($"FileTransferWebAPI {_fileTransferWebAPIAccess.ID} cancelled the transfer {aRequest.ID}.{aCancellationToken.CancellationReason}");
 
-                    result = new TransferResult(aRequest.ID, TransferResultStatus.Cancelled, DateTime.Now, aCancellationToken.CancellationReason);
+                    result = new TransferResult(aRequest.ID, TransferResultStatus.Error, DateTime.Now, aCancellationToken.CancellationReason);
                 }
                 catch (Exception ex)
                 {
                     if (aCancellationToken.IsCancellationRequested)
                     {
-                        if (!string.IsNullOrEmpty(transferJobGuid))
+                        if (transferJobGuid != Guid.Empty)
                         {
-                            await client.PutAsync($"{url}/api/transfers/{aRequest.ID}/cancel", null);
+                            await _fileTransferWebAPIAccess.SendTransferDeleteRequest(client, transferJobGuid);
                         }
 
-                        aTransferProgress.Report(aRequest.ID, TransferResultStatus.Cancelled, DateTime.Now, aCancellationToken.CancellationReason);
+                        aTransferProgress.Report(aRequest.ID, TransferResultStatus.Error, DateTime.Now, aCancellationToken.CancellationReason);
 
                         _logger.LogDebug($"FileTransferWebAPI {_fileTransferWebAPIAccess.ID} cancelled the transfer {aRequest.ID}. {aCancellationToken.CancellationReason}");
 
-                        result = new TransferResult(aRequest.ID, TransferResultStatus.Cancelled, DateTime.Now, aCancellationToken.CancellationReason);
+                        result = new TransferResult(aRequest.ID, TransferResultStatus.Error, DateTime.Now, aCancellationToken.CancellationReason);
                     }
                     else
                     {

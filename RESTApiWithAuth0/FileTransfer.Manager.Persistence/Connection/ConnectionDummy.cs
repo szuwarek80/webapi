@@ -3,11 +3,10 @@ using FileTransfer.Manager.Persistence.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 
 namespace FileTransfer.Manager.Persistence.Connection
 {
-     internal class ConnectionDummy :
+    internal class ConnectionDummy :
         IConnection
     {
 
@@ -18,7 +17,13 @@ namespace FileTransfer.Manager.Persistence.Connection
                SourceID = Guid.Parse("ED44319A-0E96-4EAD-BEA7-78739058D797"),
                Name = "MAM_Dummy",
                Type = 0, //=>TransferSourceType.FileTransferWebAPI
-               ConnectionDescription = "http://localhost:3000",
+               ConnectionDescription =
+                @"{
+                    ""url"": ""http://localhost:3000"",
+                    ""client_id"": ""8B0IBARh3osRgFDLwyNZ0bGT5uQLZgH6"",
+                    ""client_secret"": ""k2zNHbqDe3oncqKj47F14QcRPsosoZoYsnJVPt3i1paczO2U2P7KA4O2wXt2QiEU"",
+                    ""domanin"": ""dev-gge429oy.us.auth0.com""
+                }"
             },
         };
 
@@ -179,6 +184,7 @@ namespace FileTransfer.Manager.Persistence.Connection
                 if (tr.TransferRequestID == aTransferRequestID)
                 {
                     tr.Status = aStatus;
+                    tr.Result = aResult;
                     tr.Description = aDescription;
                     break;
                 }

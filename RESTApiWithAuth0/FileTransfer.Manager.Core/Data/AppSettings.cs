@@ -1,7 +1,5 @@
 ﻿using FileTransfer.Manager.Persistence.Connection;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace FileTransfer.Manager.Core.Data

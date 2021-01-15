@@ -18,8 +18,5 @@ namespace FileTransfer.Manager.Persistence.Entities
         public SqlDateTime StatusUpdated { get; set; }
         public int Status { get; set; } = 0;
         public string Description { get; set; }
-
-
-        //public Source Source { get; internal set; }
     }
 }

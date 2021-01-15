@@ -1,8 +1,6 @@
 ﻿using FileTransfer.Manager.Core.Data;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace FileTransfer.Manager.Core.Services.Settings

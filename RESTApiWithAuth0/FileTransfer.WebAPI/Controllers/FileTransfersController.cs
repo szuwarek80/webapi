@@ -24,15 +24,16 @@ namespace FileTransfer.WebAPI.Controllers
         }
 
          [HttpPost]
-         public IActionResult CreateFileTransferRequest(CreateTransferDto aRequest)
+         [Authorize]
+         public IActionResult CreateFileTransferRequest(CreateFileTransferDto aRequest)
          {
              _logger.LogDebug($"Request: {JsonConvert.SerializeObject(aRequest)}");
 
              return Ok(_service.CreateFileTransfer(aRequest));
          }
 
-        [HttpGet("{aID}/status")]
-        public IActionResult GetTransferStatusRequest(Guid aID)
+        [HttpGet("{aID}")]
+        public IActionResult GetFileTransferRequest(Guid aID)
         {
             var status = _service.GetFileTransferStatus(aID);
 
@@ -49,7 +50,9 @@ namespace FileTransfer.WebAPI.Controllers
         }
      
         [HttpDelete("{aID}")]
-        public IActionResult DeleteTransferRequest(Guid aID)
+        [Authorize]
+
+        public IActionResult DeleteFileTransferRequest(Guid aID)
         {
             if (_service.DeleteTransfer(aID, out bool forbidden))
             {

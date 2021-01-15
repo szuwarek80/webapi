@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FileTransfer.Manager.Core.Services.Settings;
@@ -20,8 +19,8 @@ namespace FileTransfer.Manager.Core.Services.Transfer
         private Dictionary<TransferSourceType, ITransferSourceFactory> _transferSourceFactory;
         private Dictionary<Guid, TransferSourceItemProxy> _transferSources;
 
-        private Task startLoopTask;
-        private CancellationTokenSource cancelSource;
+        private Task _startLoopTask;
+        private CancellationTokenSource _cancelSource;
 
         private readonly Logger<FileTransferService> _logger;
         private readonly IFileTransferStatusUpdateService _fileTransferStatusUpdateService;
@@ -52,11 +51,11 @@ namespace FileTransfer.Manager.Core.Services.Transfer
             {
                 try
                 {
-                    cancelSource = new CancellationTokenSource();
+                    _cancelSource = new CancellationTokenSource();
 
                     _fileTransferStatusUpdateService.Start();
 
-                    startLoopTask = Task.Factory.StartNew(() => this.StartLoop(), cancelSource.Token,
+                    _startLoopTask = Task.Factory.StartNew(() => this.StartLoop(), _cancelSource.Token,
                         TaskCreationOptions.LongRunning, TaskScheduler.Default);
                 }
                 catch (Exception e)
@@ -75,8 +74,8 @@ namespace FileTransfer.Manager.Core.Services.Transfer
 
         public void Stop()
         {
-            cancelSource.Cancel();
-            startLoopTask.Wait();
+            _cancelSource.Cancel();
+            _startLoopTask.Wait();
 
             _fileTransferStatusUpdateService.Stop();
             _connection.Close();
@@ -86,7 +85,7 @@ namespace FileTransfer.Manager.Core.Services.Transfer
         {
             _logger.LogAlways("Started processing loop.");
 
-            while (!cancelSource.IsCancellationRequested)
+            while (!_cancelSource.IsCancellationRequested)
             {
                 List<Guid> keys = _transferSources.Keys.ToList<Guid>();
 
@@ -156,10 +155,9 @@ namespace FileTransfer.Manager.Core.Services.Transfer
                                     {
                                         var sourceDto = new TransferSourceDto(source.Type, source.SourceID, 
                                             source.Name,  source.ConnectionDescription);
-                                        var destDto = new TransferDestinationDto();
                                         var requestDto = new TransferRequestDto(request.TransferRequestID,
                                             request.FileID, request.FileHash, 
-                                            request.FileName, sourceDto, destDto);
+                                            request.FileName, sourceDto);
 
                                         // force to change status from Scheduled to Prepared -- if true transfer can be started
                                         if (MarkTransferRequestAsPrepared(request.TransferRequestID))
@@ -182,7 +180,7 @@ namespace FileTransfer.Manager.Core.Services.Transfer
                     {
                         _logger.LogError("Connection lost. Trying to reconnect...");
 
-                        while (!_connection.Open(_settingsService.AppSettings, out string error) && !cancelSource.IsCancellationRequested)
+                        while (!_connection.Open(_settingsService.AppSettings, out string error) && !_cancelSource.IsCancellationRequested)
                         {
                             _logger.LogError($"Still connection is closed - [{error}]. The next reconnection attempt will be made after {_settingsService.AppSettings.NewRequestsQueryInterval} ms.");
                             Thread.Sleep(_settingsService.AppSettings.NewRequestsQueryInterval);
@@ -267,17 +265,18 @@ namespace FileTransfer.Manager.Core.Services.Transfer
                 _transferSource.Init(new TransferSourceDto(source.Type, source.SourceID, source.Name,  source.ConnectionDescription));
             }
 
-            public bool IsSourceChanged(Source source)
+            public bool IsSourceChanged(Source aSource)
             {
-                return false;
-                /*
-                if (_source.Modified == _source.Modified)
+                if (_source.Modified.IsNull && aSource.Modified.IsNull)
+                {
+                    return false;
+                }
+                if (_source.Modified == aSource.Modified)
                 {
                     return false;
                 }
 
                 return true;
-                */
             }
 
             public void Finit()

@@ -7,8 +7,8 @@ namespace FileTransfer.WebAPI.Services
 {
     public abstract class FileTransfersControllerService
     {
-        public abstract Guid CreateFileTransfer(CreateTransferDto aRequest);
-        public abstract TransferStatusDto GetFileTransferStatus(Guid aID);
+        public abstract FileTransferDto CreateFileTransfer(CreateFileTransferDto aRequest);
+        public abstract FileTransferDto GetFileTransferStatus(Guid aID);
         public abstract bool DeleteTransfer(Guid aID, out bool aForbidden);
     }
 }

@@ -15,25 +15,17 @@ namespace FileTransfer.Manager.Persistence.Repositories
 
         public virtual IEnumerable<T> GetAll()
         {
-            var result = new List<T>();
-
-            //ToDo
-
-            return result;
+            throw new NotImplementedException();
         }
 
         public virtual T GetById(Guid aID)
         {
-            var entity = new T();
-
-            //ToDo
-
-            return entity;
+            throw new NotImplementedException();
         }
 
         public void Delete(Guid aID)
         {
-            //ToDo
+            throw new NotImplementedException();
         }
 
         public abstract Guid Insert(T aEntity);

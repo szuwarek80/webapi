@@ -3,8 +3,6 @@ using FileTransfer.Manager.Persistence.Connection;
 using Shared.Logging;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -155,11 +153,11 @@ namespace FileTransfer.Manager.Core.Services.Transfer
                     _databseConnection.TransferRequestRepository.UpdateRequestOnFinish(statusDto.TransferID, statusDto.Date,
                         (int)statusDto.CurrentStatus, statusDto.Description, "");
                     break;
-                case TransferResultStatus.Cancelled:
                 case TransferResultStatus.Error:
                     _databseConnection.TransferRequestRepository.UpdateRequestOnFinish(statusDto.TransferID, statusDto.Date,
-                        (int)statusDto.CurrentStatus, "", statusDto.Description);
+                        (int)statusDto.CurrentStatus,"", statusDto.Description);
                     break;
+
             }
         }
     }

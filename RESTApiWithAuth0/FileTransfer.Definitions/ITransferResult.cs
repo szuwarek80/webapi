@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FileTransfer.Definitions
 {
@@ -11,8 +9,7 @@ namespace FileTransfer.Definitions
         Started = 2,
         InProgress = 3,
         Error = 4,
-        Success = 5,
-        Cancelled = 6,
+        Success = 5
     }
 
     public interface ITransferResult
