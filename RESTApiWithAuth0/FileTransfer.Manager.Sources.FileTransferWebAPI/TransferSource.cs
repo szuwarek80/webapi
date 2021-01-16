@@ -72,9 +72,9 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
                     //--- SENDING CREATE TRANSFER REQUEST
                     aTransferProgress.Report(aRequest.ID, TransferResultStatus.InProgress, DateTime.Now, "Sending the transfer request...");
-                    FileTransferDto fileTransfer = await _fileTransferWebAPIAccess.SendTransferCreateRequest(client, aRequest);
-                    transferJobGuid = fileTransfer.TransferRequestID;
-                   
+                    transferJobGuid = await _fileTransferWebAPIAccess.SendTransferCreateRequest(client, aRequest);
+
+                    FileTransferDto fileTransfer = null;                   
                     //--- SENDING GET TRANSFER REQUEST TO UPDATE THE TRANSFER SATUS 
                     do
                     {

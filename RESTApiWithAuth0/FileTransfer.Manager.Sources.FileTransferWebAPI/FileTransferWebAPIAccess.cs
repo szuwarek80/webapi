@@ -12,6 +12,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 {
     public class FileTransferWebAPIAccess
     {
+        const string _audience = "https://file-transfer";
         private API _api;
         private string _url;
         private object _lock = new object();
@@ -34,7 +35,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
        
 
-        public async Task<FileTransferDto> SendTransferCreateRequest(HttpClient aClient, TransferRequestDto aRequest)
+        public async Task<Guid> SendTransferCreateRequest(HttpClient aClient, TransferRequestDto aRequest)
         {
             var request = new CreateFileTransferDto() { FileID = aRequest.FileID };
 
@@ -55,10 +56,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
             }
 
             string ret = await response.Content?.ReadAsStringAsync();
-
-            FileTransferDto statusResponse = JsonConvert.DeserializeObject<FileTransferDto>(ret);
-
-            return statusResponse;
+            return Guid.Parse(ret.Trim('"'));
         }
 
         public async Task<FileTransferDto> SendTransferGetRequest(HttpClient aClient, Guid aTaskID)
@@ -107,7 +105,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
             {
                 client_id = _api.client_id,
                 client_secret = _api.client_secret,
-                audience = "https://file-transfer",
+                audience = _audience,
                 grant_type = "client_credentials"
             };
 
@@ -126,28 +124,27 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
             }         
         }
 
-        class AccessTokenRequest
+        struct AccessTokenRequest
         {
-            public string client_id;
-            public string client_secret;
-            public string audience;
-            public string grant_type;
+            public string client_id { get; set; }
+            public string client_secret { get; set; }
+            public string audience { get; set; }
+            public string grant_type { get; set; }
         }
 
         class AccessTokenResponse
         { 
-            public string access_token;
-            public string token_type;
-            public int expires_in;
-                
+            public string access_token { get; set; }
+            public string token_type { get; set; }
+            public int expires_in { get; set; }
         }
 
         class API
         {
-            public string url;
-            public string client_id;
-            public string client_secret;
-            public string domanin;
+            public string url { get; set; }
+            public string client_id { get; set; }
+            public string client_secret { get; set; }
+            public string domanin { get; set; }
         }
     }
 }

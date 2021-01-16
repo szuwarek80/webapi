@@ -7,6 +7,7 @@ using Shared.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FileTransfer.WebAPI.Controllers
 {
@@ -25,17 +26,17 @@ namespace FileTransfer.WebAPI.Controllers
 
          [HttpPost]
          [Authorize]
-         public IActionResult CreateFileTransferRequest(CreateFileTransferDto aRequest)
+         public async Task<IActionResult> CreateFileTransferRequest(CreateFileTransferDto aRequest)
          {
              _logger.LogDebug($"Request: {JsonConvert.SerializeObject(aRequest)}");
 
-             return Ok(_service.CreateFileTransfer(aRequest));
+             return Ok(await _service.CreateFileTransfer(aRequest));
          }
 
         [HttpGet("{aID}")]
-        public IActionResult GetFileTransferRequest(Guid aID)
+        public async Task<IActionResult> GetFileTransferRequest(Guid aID)
         {
-            var status = _service.GetFileTransferStatus(aID);
+            var status = await _service.GetFileTransferStatus(aID);
 
             if (status == null)
             {
@@ -51,10 +52,9 @@ namespace FileTransfer.WebAPI.Controllers
      
         [HttpDelete("{aID}")]
         [Authorize]
-
-        public IActionResult DeleteFileTransferRequest(Guid aID)
+        public async Task<IActionResult> DeleteFileTransferRequest(Guid aID)
         {
-            if (_service.DeleteTransfer(aID, out bool forbidden))
+            if (await _service.DeleteTransfer(aID, out bool forbidden))
             {
                 _logger.LogDebug($"{aID} removed");
 

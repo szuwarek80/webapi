@@ -27,22 +27,13 @@ namespace FileTransfer.Manager.Persistence.Connection
             },
         };
 
-        static List<TransferRequest> _transferRequests = new List<TransferRequest>();
-        //{
-        //    new TransferRequest()
-        //    {
-        //        TransferRequestID= Guid.NewGuid(),
-        //        FileID ="xxx",
-        //        FileHash = "xxx",
-        //        FileName = "xxx",
-        //        SourceID = _sources[0].SourceID,
-        //    }
-        //};
+        static List<TransferRequest> _transfers = new List<TransferRequest>();
 
+      
         public ConnectionDummy()
         {
-            this.TransferRequestRepository = new TransferRequestRepositoryDummy(_transferRequests);
             this.SourceRepository = new SourceRespositoryDummy(_sources);
+            this.TransferRequestRepository = new TransferRequestRepositoryDummy(_transfers);
             this.ConnectionState = ConnectionState.Closed;
         }
 
@@ -110,6 +101,7 @@ namespace FileTransfer.Manager.Persistence.Connection
     public class TransferRequestRepositoryDummy : Repository<TransferRequest>, ITransferRequestRepository<TransferRequest>
     {
         List<TransferRequest> _transfers;
+
         public TransferRequestRepositoryDummy(List<TransferRequest> aTransfers)
         {
             _transfers = aTransfers;
@@ -122,24 +114,22 @@ namespace FileTransfer.Manager.Persistence.Connection
 
         public override Guid Insert(TransferRequest entity)
         {
-            //ToDo
-            return Guid.NewGuid();
             throw new NotImplementedException();
         }
 
         public override void Update(TransferRequest entity)
         {
-            //ToDo
+            throw new NotImplementedException();
         }
 
-        public IEnumerable<TransferRequest> GetNewRequestsBySourceIDOrderedByPriorityAndScheduledTime(Guid sourceID, int maxItems = 1)
+        public IEnumerable<TransferRequest> GetNewRequestsBySourceIDOrderedByPriorityAndScheduledTime(Guid sourceID, 
+            int maxItems = 1)
         {
             var transfers = new List<TransferRequest>();
 
             foreach (var tr in _transfers)
                 if (tr.Status == 0)
                     transfers.Add(tr);
-
 
             return transfers;
         }
@@ -217,7 +207,6 @@ namespace FileTransfer.Manager.Persistence.Connection
                     return tr;
             return null;
         }
-
 
     }
 }
