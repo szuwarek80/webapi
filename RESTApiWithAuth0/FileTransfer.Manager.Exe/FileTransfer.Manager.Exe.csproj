@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.3" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\FileTransfer.Manager.Core\FileTransfer.Manager.Core.csproj" />
+    <ProjectReference Include="..\FileTransfer.Manager.Persistence\FileTransfer.Manager.Persistence.csproj" />
+    <ProjectReference Include="..\FileTransfer.Manager.Sources.FileTransferWebAPI\FileTransfer.Manager.Sources.FileTransferWebAPI.csproj" />
+    <ProjectReference Include="..\FileTransfer.WebAPI\FileTransfer.WebAPI.csproj" />
+    <ProjectReference Include="..\Shared.Logging\Shared.Logging.csproj" />
+  </ItemGroup>
+
+</Project>
