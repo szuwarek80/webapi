@@ -16,7 +16,6 @@ namespace FileTransfer.Manager.Core.Services.Transfer
     public class FileTransferStartService : IFileTransferStartService
     {
         private IConnection _connection;
-        private Dictionary<TransferSourceType, ITransferSourceFactory> _transferSourceFactory;
         private Dictionary<Guid, TransferSourceItemProxy> _transferSources;
 
         private Task _startLoopTask;
@@ -25,10 +24,11 @@ namespace FileTransfer.Manager.Core.Services.Transfer
         private readonly Logger<FileTransferStartService> _logger;
         private readonly IFileTransferStatusUpdateService _fileTransferStatusUpdateService;
         private readonly ISettingsService _settingsService;
+        protected readonly ITransferSourceFactoryService _transferSourceFactory;
 
         public FileTransferStartService(ISettingsService aSettingsService, 
-            IConnectionFactory aConnectionFactory, 
-            Dictionary<TransferSourceType, ITransferSourceFactory> aTransferSourceFactory,
+            IConnectionFactory aConnectionFactory,
+            ITransferSourceFactoryService aTransferSourceFactory,
             IFileTransferStatusUpdateService aFileTransferStatusUpdateService)
         {
             _settingsService = aSettingsService;
@@ -99,8 +99,7 @@ namespace FileTransfer.Manager.Core.Services.Transfer
 
                         if (proxy == null)
                         {
-                            var transferSource = _transferSourceFactory.ContainsKey((TransferSourceType)source.Type) ?
-                                _transferSourceFactory[(TransferSourceType)source.Type].CreateTransferSource() : null;
+                            var transferSource = _transferSourceFactory.CreateTransferSource((TransferSourceType)source.Type);
 
                             if (transferSource != null)
                             {

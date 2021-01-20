@@ -1,7 +1,7 @@
-﻿using FileTransfer.Definitions.Dto;
-using FileTransfer.Exe.Transfer;
+﻿using FileTransfer.Exe.Transfer;
 using FileTransfer.WebAPI.Definitions;
 using FileTransfer.WebAPI.Definitions.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -23,7 +23,7 @@ namespace FileTransfer.Exe.Controllers
         }
 
         [HttpPost]
-       // [Authorize]
+        [Authorize]
         public IActionResult FileTransferCreateRequest(FileTransferCreateDto<string> aRequest)
         {
             _logger?.LogDebug("'{0}' has been invoked", nameof(FileTransferCreateRequest));

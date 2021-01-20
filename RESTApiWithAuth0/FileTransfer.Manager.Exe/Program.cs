@@ -16,12 +16,9 @@ namespace FileTransfer.Manager.Exe
     public class Program
     {
         private static int _port;
-        //static SettingsService _settingsService;
 
         public static void Main(string[] args)
         {
-            //_settingsService = new SettingsService(true);
-
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             _port = configuration.GetValue<int>("Port");
 

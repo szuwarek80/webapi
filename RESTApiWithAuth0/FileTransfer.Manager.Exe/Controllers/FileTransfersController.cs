@@ -1,12 +1,15 @@
-﻿using FileTransfer.Definitions.Dto;
+﻿using FileTransfer.Definitions;
+using FileTransfer.Definitions.Dto;
 using FileTransfer.Manager.Exe.Models;
 using FileTransfer.Manager.Exe.Services;
+using FileTransfer.Manager.Persistence.Connection;
 using FileTransfer.WebAPI.Definitions;
 using FileTransfer.WebAPI.Definitions.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FileTransfer.Manager.Exe.Controllers
@@ -16,17 +19,17 @@ namespace FileTransfer.Manager.Exe.Controllers
     public class FileTransfersController : ControllerBase
     {
         private readonly ILogger<FileTransfersController> _logger;
-        private readonly IFileTransferService _service;
+        private readonly IConnection _connection;
 
-        public FileTransfersController(ILogger<FileTransfersController> aLogger, IFileTransferService aService)
+        public FileTransfersController(ILogger<FileTransfersController> aLogger, IConnectionFactory aConnectionFactory)
         {
             _logger = aLogger;
-            _service = aService;
-        }
+            _connection = aConnectionFactory.CreateConnection();
+        }        
 
         [HttpPost]
       //  [Authorize]
-        public async Task<IActionResult> FileTransferCreateRequest(FileTransferCreateDto<SystemFileID> aRequest)
+        public IActionResult FileTransferCreateRequest(FileTransferCreateDto<SystemFileID> aRequest)
         {
             _logger?.LogDebug("'{0}' has been invoked", nameof(FileTransferCreateRequest));
 
@@ -34,7 +37,14 @@ namespace FileTransfer.Manager.Exe.Controllers
 
             try
             {
-                response.Model = await _service.TransferCreate(aRequest);
+                var tr = _connection.TransferRequestRepository.RequestStart(
+                      new Persistence.Repositories.RequestStartDto()
+                      {
+                          SourceID = aRequest.FileID.SourceID,
+                          FileID = aRequest.FileID.FileID
+                      });
+
+                response.Model = tr.TransferRequestID;
 
                 _logger?.LogInformation("Trasnfer '{0}' has been started", response.Model);
             }
@@ -50,14 +60,14 @@ namespace FileTransfer.Manager.Exe.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> FileTransferGetAllRequest()
+        public IActionResult FileTransferGetAllRequest()
         {
             _logger?.LogDebug("'{0}' has been invoked", nameof(FileTransferGetAllRequest));
 
             var response = new ListResponse<FileTransferDto>();
             try
             {
-                response.Model = await _service.TransferGet();
+                response.Model = new List<FileTransferDto>();
 
                 _logger?.LogInformation("Trasnfer '{0}' has been started", response.Model);
             }
@@ -73,7 +83,7 @@ namespace FileTransfer.Manager.Exe.Controllers
 
 
         [HttpGet("{aID}")]
-        public async Task<IActionResult> FileTransferGetRequest(Guid aID)
+        public IActionResult FileTransferGetRequest(Guid aID)
         {
             _logger?.LogDebug("'{0}' has been invoked", nameof(FileTransferGetRequest));
 
@@ -81,7 +91,16 @@ namespace FileTransfer.Manager.Exe.Controllers
 
             try
             {
-                response.Model =  await _service.TransferGet(aID);
+                var tr = _connection.TransferRequestRepository.GetById(aID);
+
+                if (tr != null)
+                    response.Model =  new FileTransferDto()
+                    {
+                        TransferRequestID = tr.TransferRequestID,
+                        Status = (TransferResultStatus)tr.Status,
+                        Description = tr.Description,
+                        Result = tr.Result
+                    }; ;
 
                 _logger?.LogInformation("Status retrieved successfully {0}.", response.Model);
             }
