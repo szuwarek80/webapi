@@ -25,7 +25,8 @@ namespace FileTransfer.Manager.Core.Services.Transfer
 
         private Task _serviceTask;
 
-        public FileTransferStatusUpdateService(IConnectionFactory aConnectionFactory, IConnectionSettings aConnectionSettings)
+        public FileTransferStatusUpdateService(IConnectionFactory aConnectionFactory,
+                                               IConnectionSettings aConnectionSettings)
         {
             _databseConnection = aConnectionFactory.CreateConnection();
             _connectionSettings = aConnectionSettings;

@@ -1,3 +1,4 @@
+using FileTransfer.Manager.Core.Services.Settings;
 using FileTransfer.Manager.Exe.Services;
 using FileTransfer.Manager.Persistence.Connection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -32,8 +33,15 @@ namespace FileTransfer.Manager.Exe
             });
 
 
+            //FileTransfer.Manager.Persistence
+            services.AddSingleton(typeof(ISettingsService), typeof(SettingsService));
+            //FileTransfer.Manager.Core
             services.AddSingleton(typeof(IConnectionFactory), typeof(ConnectionFactory));
+
+            //FileTransfer.Manager.Exe
             services.AddSingleton(typeof(IFileTransferService), typeof(FileTransferService));
+            services.AddHostedService<FileTransferManagerBackgroundService>();
+
             services.AddControllers();
         }
 

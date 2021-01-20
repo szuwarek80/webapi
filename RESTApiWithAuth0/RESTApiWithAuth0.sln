@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.Manager.Exe", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.Manager.Core", "FileTransfer.Manager.Core\FileTransfer.Manager.Core.csproj", "{7FCFDF2A-9D86-4702-ABA3-DC142D41104D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.Logging", "Shared.Logging\Shared.Logging.csproj", "{5BF361D9-73B8-4305-8E8A-2B7C7BEEA4CC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.Manager.Persistence", "FileTransfer.Manager.Persistence\FileTransfer.Manager.Persistence.csproj", "{D0B7626A-4F6B-4203-998E-6D03F5206FCF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.Manager.Sources.FileTransferWebAPI", "FileTransfer.Manager.Sources.FileTransferWebAPI\FileTransfer.Manager.Sources.FileTransferWebAPI.csproj", "{981885F8-2B39-4A9D-A6AC-18EC11EFA235}"
@@ -20,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.Definitions", "FileTransfer.Definitions\FileTransfer.Definitions.csproj", "{C58AF1EC-CD53-4E42-9B37-A84D5F661B43}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileTransfer.Exe.UnitTests", "FileTransfer.Exe.UnitTests\FileTransfer.Exe.UnitTests.csproj", "{2E647CB5-0706-41DF-B91A-7E0BC2352D9B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.Logging", "Shared.Logging\Shared.Logging.csproj", "{BA259F0A-0AF2-4F10-9CEA-B7C06B188768}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,6 @@ Global
 		{7FCFDF2A-9D86-4702-ABA3-DC142D41104D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FCFDF2A-9D86-4702-ABA3-DC142D41104D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FCFDF2A-9D86-4702-ABA3-DC142D41104D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5BF361D9-73B8-4305-8E8A-2B7C7BEEA4CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5BF361D9-73B8-4305-8E8A-2B7C7BEEA4CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5BF361D9-73B8-4305-8E8A-2B7C7BEEA4CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5BF361D9-73B8-4305-8E8A-2B7C7BEEA4CC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D0B7626A-4F6B-4203-998E-6D03F5206FCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D0B7626A-4F6B-4203-998E-6D03F5206FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0B7626A-4F6B-4203-998E-6D03F5206FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,6 +59,10 @@ Global
 		{2E647CB5-0706-41DF-B91A-7E0BC2352D9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E647CB5-0706-41DF-B91A-7E0BC2352D9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E647CB5-0706-41DF-B91A-7E0BC2352D9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA259F0A-0AF2-4F10-9CEA-B7C06B188768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA259F0A-0AF2-4F10-9CEA-B7C06B188768}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA259F0A-0AF2-4F10-9CEA-B7C06B188768}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA259F0A-0AF2-4F10-9CEA-B7C06B188768}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

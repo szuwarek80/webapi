@@ -16,11 +16,11 @@ namespace FileTransfer.Manager.Exe
     public class Program
     {
         private static int _port;
-        static SettingsService _settingsService;
+        //static SettingsService _settingsService;
 
         public static void Main(string[] args)
         {
-            _settingsService = new SettingsService(true);
+            //_settingsService = new SettingsService(true);
 
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             _port = configuration.GetValue<int>("Port");
@@ -41,7 +41,7 @@ namespace FileTransfer.Manager.Exe
               })
             .ConfigureServices(services =>
             {
-                services.AddHostedService(x => new FileTransferManagerBackgroundService(_settingsService));
+                //services.AddHostedService(x => new FileTransferManagerBackgroundService(_settingsService));
                       // WindowsService logs
                 services.Configure<EventLogSettings>(config =>
                 {

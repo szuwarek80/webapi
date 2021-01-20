@@ -3,6 +3,7 @@ using FileTransfer.Manager.Core.Services.Settings;
 using FileTransfer.Manager.Core.Services.Transfer;
 using FileTransfer.Manager.Persistence.Connection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -12,14 +13,14 @@ namespace FileTransfer.Manager.Exe.Services
 {
     public class FileTransferManagerBackgroundService : BackgroundService
     {
-        private readonly Shared.Logging.Logger<FileTransferManagerBackgroundService> _logger;
+        private readonly ILogger<FileTransferManagerBackgroundService> _logger;
         private readonly ISettingsService _settingsService;
         private IFileTransferStartService _fileTransferService;
 
-        public FileTransferManagerBackgroundService(ISettingsService settings)
+        public FileTransferManagerBackgroundService(ILogger<FileTransferManagerBackgroundService> aLogger, ISettingsService aSettings)
         {
-            _logger = new Shared.Logging.Logger<FileTransferManagerBackgroundService>();
-            _settingsService = settings;
+            _logger = aLogger;
+            _settingsService = aSettings;
 
             var sourceFactory = new Dictionary<TransferSourceType, ITransferSourceFactory>();
 
@@ -50,7 +51,7 @@ namespace FileTransfer.Manager.Exe.Services
             }
             else
             {
-                _logger.LogAlways($"File transfer not started: {startErrorMessage}.");
+                _logger.LogInformation($"File transfer not started: {startErrorMessage}.");
 
                 // Stop windows service
                 throw new Exception(startErrorMessage);

@@ -17,12 +17,8 @@ namespace FileTransfer.Manager.Core.Services.Settings
 
         public SettingsService()
         {
-            this.DeserializeSettings();
-        }
-
-        public SettingsService(bool aIsDummy)
-        {
             this.AppSettings = new AppSettings();
+            //this.DeserializeSettings();
         }
         
         public void DeserializeSettings()
