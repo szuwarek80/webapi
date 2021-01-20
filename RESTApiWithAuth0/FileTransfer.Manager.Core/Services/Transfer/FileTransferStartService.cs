@@ -13,7 +13,7 @@ using Shared.Logging;
 
 namespace FileTransfer.Manager.Core.Services.Transfer
 {
-    public class FileTransferService : IFileTransferService
+    public class FileTransferStartService : IFileTransferStartService
     {
         private IConnection _connection;
         private Dictionary<TransferSourceType, ITransferSourceFactory> _transferSourceFactory;
@@ -22,11 +22,11 @@ namespace FileTransfer.Manager.Core.Services.Transfer
         private Task _startLoopTask;
         private CancellationTokenSource _cancelSource;
 
-        private readonly Logger<FileTransferService> _logger;
+        private readonly Logger<FileTransferStartService> _logger;
         private readonly IFileTransferStatusUpdateService _fileTransferStatusUpdateService;
         private readonly ISettingsService _settingsService;
 
-        public FileTransferService(ISettingsService aSettingsService, 
+        public FileTransferStartService(ISettingsService aSettingsService, 
             IConnectionFactory aConnectionFactory, 
             Dictionary<TransferSourceType, ITransferSourceFactory> aTransferSourceFactory,
             IFileTransferStatusUpdateService aFileTransferStatusUpdateService)
@@ -40,7 +40,7 @@ namespace FileTransfer.Manager.Core.Services.Transfer
 
             _fileTransferStatusUpdateService = aFileTransferStatusUpdateService;
 
-            _logger = new Logger<FileTransferService>();
+            _logger = new Logger<FileTransferStartService>();
         }
 
         public bool Start(out string aError)

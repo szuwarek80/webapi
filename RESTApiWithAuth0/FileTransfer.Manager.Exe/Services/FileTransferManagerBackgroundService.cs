@@ -1,21 +1,20 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using FileTransfer.Definitions;
+using FileTransfer.Manager.Core.Services.Settings;
+using FileTransfer.Manager.Core.Services.Transfer;
+using FileTransfer.Manager.Persistence.Connection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FileTransfer.Definitions;
-using FileTransfer.Manager.Core.Services.Settings;
-using FileTransfer.Manager.Core.Services;
-using FileTransfer.Manager.Core.Services.Transfer;
 
-namespace FileTransfer.Manager.Exe
+namespace FileTransfer.Manager.Exe.Services
 {
     public class FileTransferManagerBackgroundService : BackgroundService
     {
         private readonly Shared.Logging.Logger<FileTransferManagerBackgroundService> _logger;
         private readonly ISettingsService _settingsService;
-        private IFileTransferService _fileTransferService;
+        private IFileTransferStartService _fileTransferService;
 
         public FileTransferManagerBackgroundService(ISettingsService settings)
         {
@@ -27,9 +26,9 @@ namespace FileTransfer.Manager.Exe
             sourceFactory.Add(TransferSourceType.FileTransferWebAPI,
                 new FileTransfer.Manager.Sources.FileTransferWebAPI.TransferSourceFactory(_settingsService.AppSettings.StatusRequestInterval));
 
-            var connectionFactory = new FileTransfer.Manager.Persistence.Connection.ConnectionFactory();
+            var connectionFactory = new ConnectionFactory();
 
-            _fileTransferService = new FileTransferService(_settingsService,
+            _fileTransferService = new FileTransferStartService(_settingsService,
                 connectionFactory,
                 sourceFactory,
                 new FileTransferStatusUpdateService(connectionFactory, _settingsService.AppSettings));

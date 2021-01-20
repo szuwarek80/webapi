@@ -1,7 +1,8 @@
 ﻿using FileTransfer.Definitions;
 using FileTransfer.Definitions.BaseImplementation;
 using FileTransfer.Definitions.Dto;
-using FileTransfer.WebAPI.Dto;
+using FileTransfer.WebAPI.Definitions;
+using FileTransfer.WebAPI.Definitions.Dto;
 using Shared.Logging;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,9 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
                     //--- SENDING CREATE TRANSFER REQUEST
                     aTransferProgress.Report(aRequest.ID, TransferResultStatus.InProgress, DateTime.Now, "Sending the transfer request...");
-                    transferJobGuid = await _fileTransferWebAPIAccess.SendTransferCreateRequest(client, aRequest);
+                    
+                    var startResult = await _fileTransferWebAPIAccess.SendTransferCreateRequest(client, aRequest);
+                    transferJobGuid = startResult.Model;
 
                     FileTransferDto fileTransfer = null;                   
                     //--- SENDING GET TRANSFER REQUEST TO UPDATE THE TRANSFER SATUS 
@@ -80,7 +83,8 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        fileTransfer = await _fileTransferWebAPIAccess.SendTransferGetRequest(client, transferJobGuid);
+                        var getResult = await _fileTransferWebAPIAccess.SendTransferGetRequest(client, transferJobGuid);
+                        fileTransfer = getResult.Model;
 
                         if (fileTransfer.Status == TransferResultStatus.Success)
                         {

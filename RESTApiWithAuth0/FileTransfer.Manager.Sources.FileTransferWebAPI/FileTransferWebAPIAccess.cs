@@ -1,8 +1,8 @@
 ﻿using FileTransfer.Definitions.Dto;
-using FileTransfer.WebAPI.Dto;
+using FileTransfer.WebAPI.Definitions;
+using FileTransfer.WebAPI.Definitions.Dto;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -28,16 +28,16 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
             this.IsConnected = false;
 
             _api = JsonConvert.DeserializeObject<API>(aSource.ConnectionDescription);
-            _url = $"{_api.url.TrimEnd('/')}/api/transfers";
+            _url = $"{_api.url.TrimEnd('/')}/api/v1/transfers";
 
             Task task = GetAccessToken();
         }
 
        
 
-        public async Task<Guid> SendTransferCreateRequest(HttpClient aClient, TransferRequestDto aRequest)
+        public async Task<SingleResponse<Guid>> SendTransferCreateRequest(HttpClient aClient, TransferRequestDto aRequest)
         {
-            var request = new CreateFileTransferDto() { FileID = aRequest.FileID };
+            var request = new FileTransferCreateDto<string>() { FileID = aRequest.FileID };
 
             var json = JsonConvert.SerializeObject(request);
 
@@ -55,11 +55,12 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                 throw ex;
             }
 
-            string ret = await response.Content?.ReadAsStringAsync();
-            return Guid.Parse(ret.Trim('"'));
+            string resultContent = await response.Content?.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<SingleResponse<Guid>>(resultContent);
         }
 
-        public async Task<FileTransferDto> SendTransferGetRequest(HttpClient aClient, Guid aTaskID)
+        public async Task<SingleResponse<FileTransferDto>> SendTransferGetRequest(HttpClient aClient, Guid aTaskID)
         {
             var response = await aClient.GetAsync($"{_url}/{aTaskID}");
 
@@ -71,12 +72,10 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
             string resultContent = await response.Content.ReadAsStringAsync();
            
-            FileTransferDto statusResponse = JsonConvert.DeserializeObject<FileTransferDto>(resultContent);
-
-            return statusResponse;
+            return JsonConvert.DeserializeObject<SingleResponse<FileTransferDto>>(resultContent);
         }      
 
-        public async Task SendTransferDeleteRequest(HttpClient aClient, Guid aTaskID)
+        public async Task<Response> SendTransferDeleteRequest(HttpClient aClient, Guid aTaskID)
         {
             aClient.DefaultRequestHeaders.Authorization =
              new AuthenticationHeaderValue("Bearer", this.AccessToken);
@@ -88,6 +87,9 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                 var ex = new Exception($"Cannot delete a transfer. Status code: {response.StatusCode}, message: {response.ReasonPhrase}.");
                 throw ex;
             }
+            string resultContent = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<Response>(resultContent);
         }
 
 

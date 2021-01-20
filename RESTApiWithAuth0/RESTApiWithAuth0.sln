@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.Manager.Source
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.Exe", "FileTransfer.Exe\FileTransfer.Exe.csproj", "{EB5CA387-95B1-418E-80DA-6EC2EF4F0082}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.WebAPI", "FileTransfer.WebAPI\FileTransfer.WebAPI.csproj", "{D3407AE6-86E8-4091-A5F5-08592A586A8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.WebAPI.Definitions", "FileTransfer.WebAPI\FileTransfer.WebAPI.Definitions.csproj", "{D3407AE6-86E8-4091-A5F5-08592A586A8E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTransfer.Definitions", "FileTransfer.Definitions\FileTransfer.Definitions.csproj", "{C58AF1EC-CD53-4E42-9B37-A84D5F661B43}"
 EndProject

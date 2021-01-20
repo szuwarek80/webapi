@@ -1,18 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using FileTransfer.Manager.Exe.Services;
 using FileTransfer.Manager.Persistence.Connection;
-using FileTransfer.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace FileTransfer.Manager.Exe
 {
@@ -39,8 +32,8 @@ namespace FileTransfer.Manager.Exe
             });
 
 
-            services.AddSingleton<ConnectionFactory>();
-            services.AddSingleton(typeof(FileTransfersControllerService), typeof(FileTransfersControllerServiceImpl));
+            services.AddSingleton(typeof(IConnectionFactory), typeof(ConnectionFactory));
+            services.AddSingleton(typeof(IFileTransferService), typeof(FileTransferService));
             services.AddControllers();
         }
 

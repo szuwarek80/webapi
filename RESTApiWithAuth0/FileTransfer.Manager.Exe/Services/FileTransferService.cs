@@ -1,51 +1,56 @@
 ﻿using FileTransfer.Definitions;
+using FileTransfer.Manager.Exe.Models;
 using FileTransfer.Manager.Persistence.Connection;
 using FileTransfer.Manager.Persistence.Entities;
-using FileTransfer.WebAPI.Dto;
-using FileTransfer.WebAPI.Services;
-using Shared.Logging;
+using FileTransfer.WebAPI.Definitions.Dto;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FileTransfer.Manager.Exe
+namespace FileTransfer.Manager.Exe.Services
 {
-    public class FileTransfersControllerServiceImpl :
-        FileTransfersControllerService
+    public interface IFileTransferService
     {
-        Logger<FileTransfersControllerServiceImpl> _logger;
+        Task<Guid> TransferCreate(FileTransferCreateDto<SystemFileID> aReqest);
+        Task<FileTransferDto> TransferGet(Guid aID);
+        Task<List<FileTransferDto>> TransferGet();
+    }
+
+    public class FileTransferService :
+        IFileTransferService
+    {
         IConnection _connection;
         SemaphoreSlim _connectionSingleThreadAccesss;
+        ILogger<FileTransferService> _logger;
 
-        public FileTransfersControllerServiceImpl(ConnectionFactory aConnectionFactory)
+        public FileTransferService(ILogger<FileTransferService> aLogger, IConnectionFactory aConnectionFactory)
         {
+            _logger = aLogger;
             _connectionSingleThreadAccesss = new SemaphoreSlim(1, 1);
-            _connection = aConnectionFactory.CreateConnection();
-            _logger = new Logger<FileTransfersControllerServiceImpl>();
+            _connection = aConnectionFactory.CreateConnection();          
         }
 
-        public override async Task<Guid> CreateFileTransfer(CreateFileTransferDto aRequest)
-        {            
+        public async Task<Guid> TransferCreate(FileTransferCreateDto<SystemFileID> aReqest)
+        {
             TransferRequest tr = null;
 
             try
             {
                 await _connectionSingleThreadAccesss.WaitAsync().ConfigureAwait(false);
 
-                string[] ids = aRequest.FileID.Split(":");
                 tr = _connection.TransferRequestRepository.RequestStart(
                       new Persistence.Repositories.RequestStartDto()
                       {
-                          SourceID = Guid.Parse(ids[0]),
-                          FileID = ids[1]
+                          SourceID = aReqest.FileID.SystemID,
+                          FileID = aReqest.FileID.FileID
                       });
 
             }
             catch (Exception ex)
             {
-                _logger.LogException(ex);
+                _logger?.LogError("{0}", ex);
             }
             finally
             {
@@ -57,8 +62,8 @@ namespace FileTransfer.Manager.Exe
 
             return Guid.Empty;
         }
-
-        public override async Task<FileTransferDto> GetFileTransferStatus(Guid aID)
+      
+        public async Task<FileTransferDto> TransferGet(Guid aID)
         {
             TransferRequest tr = null;
 
@@ -70,7 +75,7 @@ namespace FileTransfer.Manager.Exe
             }
             catch (Exception ex)
             {
-                _logger.LogException(ex);
+                _logger?.LogError("{0}", ex);
             }
             finally
             {
@@ -89,11 +94,9 @@ namespace FileTransfer.Manager.Exe
             return null;
         }
 
-        public override Task<bool> DeleteTransfer(Guid aID, out bool aForbidden)
+        public Task<List<FileTransferDto>> TransferGet()
         {
-            aForbidden = true;
-            return Task.FromResult(false);
-        }
-
+            return Task.FromResult(new List<FileTransferDto>());
+        }    
     }
 }

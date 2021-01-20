@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FileTransfer.WebAPI.Services;
+using FileTransfer.Exe.Transfer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace FileTransfer.Exe
 {
@@ -37,7 +30,8 @@ namespace FileTransfer.Exe
                 options.Audience = Configuration["Auth0:Audience"];
             });
 
-            services.AddSingleton(typeof(FileTransfersControllerService), typeof(FileTransfersControllerServiceImpl));
+            services.AddSingleton(typeof(IFileTransferJobExecutorFactory), typeof(FileTransferJobExecutorFactory));
+            services.AddSingleton(typeof(IFileTransferService), typeof(FileTransferService));
             services.AddControllers();
         }
 

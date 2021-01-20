@@ -14,7 +14,7 @@
     <ProjectReference Include="..\FileTransfer.Manager.Core\FileTransfer.Manager.Core.csproj" />
     <ProjectReference Include="..\FileTransfer.Manager.Persistence\FileTransfer.Manager.Persistence.csproj" />
     <ProjectReference Include="..\FileTransfer.Manager.Sources.FileTransferWebAPI\FileTransfer.Manager.Sources.FileTransferWebAPI.csproj" />
-    <ProjectReference Include="..\FileTransfer.WebAPI\FileTransfer.WebAPI.csproj" />
+    <ProjectReference Include="..\FileTransfer.WebAPI\FileTransfer.WebAPI.Definitions.csproj" />
     <ProjectReference Include="..\Shared.Logging\Shared.Logging.csproj" />
   </ItemGroup>
 

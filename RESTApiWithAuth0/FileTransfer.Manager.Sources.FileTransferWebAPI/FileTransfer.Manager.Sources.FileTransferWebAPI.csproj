@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FileTransfer.Definitions\FileTransfer.Definitions.csproj" />
-    <ProjectReference Include="..\FileTransfer.WebAPI\FileTransfer.WebAPI.csproj" />
+    <ProjectReference Include="..\FileTransfer.WebAPI\FileTransfer.WebAPI.Definitions.csproj" />
     <ProjectReference Include="..\Shared.Logging\Shared.Logging.csproj" />
   </ItemGroup>
 
