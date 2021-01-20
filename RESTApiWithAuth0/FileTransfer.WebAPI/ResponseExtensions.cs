@@ -1,5 +1,4 @@
-﻿using FileTransfer.Definitions.Dto;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace FileTransfer.WebAPI.Definitions

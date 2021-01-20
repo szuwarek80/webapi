@@ -1,14 +1,13 @@
 ﻿using FileTransfer.Manager.Persistence.Entities;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FileTransfer.Manager.Persistence.Repositories
 {
     public class RequestStartDto
     {
-        public string FileID { get; set; }
         public Guid SourceID { get; set; }
+        public string FileID { get; set; }
     }
 
     public interface ITransferRequestRepository<T> : IRepository<T> where T : BaseEntity

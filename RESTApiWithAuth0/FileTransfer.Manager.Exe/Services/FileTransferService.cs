@@ -43,7 +43,7 @@ namespace FileTransfer.Manager.Exe.Services
                 tr = _connection.TransferRequestRepository.RequestStart(
                       new Persistence.Repositories.RequestStartDto()
                       {
-                          SourceID = aReqest.FileID.SystemID,
+                          SourceID = aReqest.FileID.SourceID,
                           FileID = aReqest.FileID.FileID
                       });
 

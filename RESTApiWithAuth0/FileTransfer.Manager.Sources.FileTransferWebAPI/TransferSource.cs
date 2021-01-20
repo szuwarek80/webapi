@@ -1,13 +1,10 @@
 ﻿using FileTransfer.Definitions;
 using FileTransfer.Definitions.BaseImplementation;
 using FileTransfer.Definitions.Dto;
-using FileTransfer.WebAPI.Definitions;
 using FileTransfer.WebAPI.Definitions.Dto;
 using Shared.Logging;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FileTransfer.Manager.Sources.FileTransferWebAPI
@@ -15,25 +12,25 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
     public class TransferSource :
         ITransferSource
     {
-        private readonly Logger<TransferSource> _logger;
+        protected readonly IFileTransferWebAPIAccessFactory _fileTransferWebAPIAccessFactory;
+        protected  readonly Logger<TransferSource> _logger;
+        protected readonly int _statusRequestInterval;
+
         private TransferSourceDto _source;
-        private FileTransferWebAPIAccess _fileTransferWebAPIAccess;
-        private int _statusRequestInterval;
+        private IFileTransferWebAPIAccess _fileTransferWebAPIAccess;
+
+
         public TransferSourceType SourceType =>  TransferSourceType.FileTransferWebAPI;
 
-        public bool IsConnected { get 
-            {
-                if (_fileTransferWebAPIAccess != null)
-                    return _fileTransferWebAPIAccess.IsConnected;
-                return false;
-            } }
+        public bool IsConnected { get { return (_fileTransferWebAPIAccess == null? false: _fileTransferWebAPIAccess.IsConnected);} }
 
         public int MaxParallelNumberOfTransferRequests => 2;
 
-        public TransferSource(int aStatusRequestInterval)
+        public TransferSource(int aStatusRequestInterval, IFileTransferWebAPIAccessFactory aIFileTransferWebAPIAccessFactory)
         {
             _logger = new Logger<TransferSource>();
             _statusRequestInterval = aStatusRequestInterval;
+            _fileTransferWebAPIAccessFactory = aIFileTransferWebAPIAccessFactory;
         }
 
         public void Finit()
@@ -43,12 +40,19 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                 _logger.LogAlways($"FileTransferWebAPI {_source.ID} - {_source.Name} closed.");
                 _source = null;
             }
+            
+            _fileTransferWebAPIAccess?.Dispose();
+            _fileTransferWebAPIAccess = null;
         }
 
         public void Init(TransferSourceDto aSource)
         {
             _source = aSource;
-            _fileTransferWebAPIAccess = new FileTransferWebAPIAccess(aSource);
+
+            _fileTransferWebAPIAccess?.Dispose();
+
+            _fileTransferWebAPIAccess = _fileTransferWebAPIAccessFactory.Create(aSource);
+
             _logger.LogAlways($"FileTransferWebAPI {aSource.ID} - {aSource.Name} initialized.");
         }
 
@@ -73,9 +77,11 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
                     //--- SENDING CREATE TRANSFER REQUEST
                     aTransferProgress.Report(aRequest.ID, TransferResultStatus.InProgress, DateTime.Now, "Sending the transfer request...");
-                    
-                    var startResult = await _fileTransferWebAPIAccess.SendTransferCreateRequest(client, aRequest);
-                    transferJobGuid = startResult.Model;
+
+                    transferJobGuid = await _fileTransferWebAPIAccess.TransferCreate(new FileTransferCreateDto<string>()
+                            { 
+                                FileID = aRequest.FileID
+                            });
 
                     FileTransferDto fileTransfer = null;                   
                     //--- SENDING GET TRANSFER REQUEST TO UPDATE THE TRANSFER SATUS 
@@ -83,8 +89,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        var getResult = await _fileTransferWebAPIAccess.SendTransferGetRequest(client, transferJobGuid);
-                        fileTransfer = getResult.Model;
+                        fileTransfer = await _fileTransferWebAPIAccess.TransferGet(transferJobGuid);
 
                         if (fileTransfer.Status == TransferResultStatus.Success)
                         {
@@ -112,7 +117,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
                     try
                     {
-                        await _fileTransferWebAPIAccess.SendTransferDeleteRequest(client, transferJobGuid);
+                        await _fileTransferWebAPIAccess.TransferRemove( transferJobGuid);
                     }
                     catch (Exception ex)
                     {
@@ -123,7 +128,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                 {
                     if (transferJobGuid != Guid.Empty)
                     {
-                        await _fileTransferWebAPIAccess.SendTransferDeleteRequest(client, transferJobGuid);
+                        await _fileTransferWebAPIAccess.TransferRemove(transferJobGuid);
                     }
 
                     aTransferProgress.Report(aRequest.ID, TransferResultStatus.Error, DateTime.Now, aCancellationToken.CancellationReason);
@@ -138,7 +143,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                     {
                         if (transferJobGuid != Guid.Empty)
                         {
-                            await _fileTransferWebAPIAccess.SendTransferDeleteRequest(client, transferJobGuid);
+                            await _fileTransferWebAPIAccess.TransferRemove(transferJobGuid);
                         }
 
                         aTransferProgress.Report(aRequest.ID, TransferResultStatus.Error, DateTime.Now, aCancellationToken.CancellationReason);
@@ -155,11 +160,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
                         result = new TransferResult(aRequest.ID, TransferResultStatus.Error, DateTime.Now, string.Empty, ex);
                     }
-                }
-                finally
-                {
-                    client.Dispose();
-                }
+                }               
 
                 _logger.LogDebug($"FileTransferWebAPI {_fileTransferWebAPIAccess.ID} finished the transfer {aRequest.ID}.");
 

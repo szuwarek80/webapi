@@ -10,43 +10,45 @@ using System.Threading.Tasks;
 
 namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 {
-    public class FileTransferWebAPIAccess
+    public class FileTransferWebAPIAccess :
+        IFileTransferWebAPIAccess
     {
         const string _audience = "https://file-transfer";
-        private API _api;
-        private string _url;
-        private object _lock = new object();
+        readonly API _api;
+        protected readonly HttpClient _client;
 
+        public bool IsConnected { get; protected set; }
         public string ID { get; }
 
-        public bool IsConnected { get; set; }
-
-
-        public FileTransferWebAPIAccess(TransferSourceDto aSource)
+        public FileTransferWebAPIAccess(TransferSourceDto aAccessData)
         {
-            this.ID = aSource.ID.ToString();
             this.IsConnected = false;
+            _client = new HttpClient();
 
-            _api = JsonConvert.DeserializeObject<API>(aSource.ConnectionDescription);
-            _url = $"{_api.url.TrimEnd('/')}/api/v1/transfers";
+            this.ID = aAccessData.ID.ToString();
+            _api = JsonConvert.DeserializeObject<API>(aAccessData.ConnectionDescription);
 
             Task task = GetAccessToken();
         }
 
-       
+        public void Dispose()
+        {
+            _client.Dispose();
+        }
+     
 
-        public async Task<SingleResponse<Guid>> SendTransferCreateRequest(HttpClient aClient, TransferRequestDto aRequest)
+        public async Task<Guid> TransferCreate(FileTransferCreateDto<string> aRequest)
         {
             var request = new FileTransferCreateDto<string>() { FileID = aRequest.FileID };
 
             var json = JsonConvert.SerializeObject(request);
 
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-            
-            aClient.DefaultRequestHeaders.Authorization =
+
+            _client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", this.AccessToken);
-           
-            var response = await aClient.PostAsync(_url, data);
+
+            var response = await _client.PostAsync(_api.url, data);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -57,12 +59,12 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
             string resultContent = await response.Content?.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<SingleResponse<Guid>>(resultContent);
+            return JsonConvert.DeserializeObject<SingleResponse<Guid>>(resultContent).Model;
         }
-
-        public async Task<SingleResponse<FileTransferDto>> SendTransferGetRequest(HttpClient aClient, Guid aTaskID)
+        
+        public async Task<FileTransferDto> TransferGet(Guid aID)
         {
-            var response = await aClient.GetAsync($"{_url}/{aTaskID}");
+            var response = await _client.GetAsync($"{_api.url}/{aID}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -71,16 +73,16 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
             }
 
             string resultContent = await response.Content.ReadAsStringAsync();
-           
-            return JsonConvert.DeserializeObject<SingleResponse<FileTransferDto>>(resultContent);
-        }      
 
-        public async Task<Response> SendTransferDeleteRequest(HttpClient aClient, Guid aTaskID)
+            return JsonConvert.DeserializeObject<SingleResponse<FileTransferDto>>(resultContent).Model;
+        }
+
+        public async Task<bool> TransferRemove(Guid aID)
         {
-            aClient.DefaultRequestHeaders.Authorization =
-             new AuthenticationHeaderValue("Bearer", this.AccessToken);
+            _client.DefaultRequestHeaders.Authorization =
+               new AuthenticationHeaderValue("Bearer", this.AccessToken);
 
-            var response = await aClient.DeleteAsync($"{_url}/{aTaskID}");
+            var response = await _client.DeleteAsync($"{_api.url}/{aID}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -89,16 +91,16 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
             }
             string resultContent = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<Response>(resultContent);
+            return JsonConvert.DeserializeObject<Response>(resultContent).HasError;
         }
 
 
-
+        private object _lockAccessToken = new object();
         string _accessToken;
         private string AccessToken
         {
-            get { lock (_lock) { return _accessToken; } }
-            set { lock (_lock) { _accessToken = value; } }
+            get { lock (_lockAccessToken) { return _accessToken; } }
+            set { lock (_lockAccessToken) { _accessToken = value; } }
         }
 
         private async Task GetAccessToken()
@@ -125,7 +127,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
                 this.IsConnected = true;
             }         
         }
-
+     
         struct AccessTokenRequest
         {
             public string client_id { get; set; }

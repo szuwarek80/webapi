@@ -19,7 +19,7 @@ namespace FileTransfer.Manager.Persistence.Connection
                Type = 0, //=>TransferSourceType.FileTransferWebAPI
                ConnectionDescription =
                 @"{
-                    ""url"": ""http://localhost:3000"",
+                    ""url"": ""http://localhost:3000/api/v1/transfers"",
                     ""client_id"": ""8B0IBARh3osRgFDLwyNZ0bGT5uQLZgH6"",
                     ""client_secret"": ""k2zNHbqDe3oncqKj47F14QcRPsosoZoYsnJVPt3i1paczO2U2P7KA4O2wXt2QiEU"",
                     ""domanin"": ""dev-gge429oy.us.auth0.com""

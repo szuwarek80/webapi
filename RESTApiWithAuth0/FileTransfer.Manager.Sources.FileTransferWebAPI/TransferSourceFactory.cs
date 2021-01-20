@@ -1,7 +1,4 @@
 ﻿using FileTransfer.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 {
@@ -17,7 +14,7 @@ namespace FileTransfer.Manager.Sources.FileTransferWebAPI
 
         public ITransferSource CreateTransferSource()
         {
-            return new TransferSource(_statusRequestInterval);
+            return new TransferSource(_statusRequestInterval, new FileTransferWebAPIAccessFactory());
         }
     }
 }
