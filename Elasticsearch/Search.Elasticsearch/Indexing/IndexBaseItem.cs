@@ -50,11 +50,15 @@ namespace Search.Elasticsearch.Indexing
                 .Custom("autocomplete", ca => ca
                     .Tokenizer("autocomplete")
                     .Filters("stopwords_eng", "trim", "lowercase")
-                )
+                    )
                 .Custom("autocomplete_search", ca => ca
                    .Tokenizer("standard")
                    .Filters("stopwords_eng", "trim", "lowercase")
-                )
+                    )
+                .Custom("keyword_list_serach", ca => ca
+                    .Tokenizer("split_list")
+                    .Filters("stopwords_eng", "trim")
+                    )
             )
             .Tokenizers(tdesc => tdesc               
                 .EdgeNGram("autocomplete", e => e
@@ -62,7 +66,8 @@ namespace Search.Elasticsearch.Indexing
                     .MaxGram(15)
                     .TokenChars(TokenChar.Letter, TokenChar.Digit)
                 )
-            )
+                .Pattern("split_list", e => e.Pattern(","))
+            )           
             .TokenFilters(f => f                
                 .Stop("stopwords_eng", lang => lang                    
                     .StopWords("_english_")

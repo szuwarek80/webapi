@@ -29,7 +29,7 @@ namespace Search.WebAPI.Exe.Controllers
         {
             _logger?.LogDebug("'{0}' has been invoked", nameof(SearchController));
 
-            var response = new PagedResponse<Elasticsearch.Mapping.SearchableBaseItem>();
+            var response = new PagedResponse<SearchableBaseItem>();
             try
             {
                 var result = await _searchSevice.Search(new SimpleSearchRequest()
@@ -40,7 +40,7 @@ namespace Search.WebAPI.Exe.Controllers
                     MarketFilterQuery = aRequest.Market,
                     Indices = new List<string>() { Config.IndexPropertyItemName, Config.IndexManagementItemName }
                 }
-                ); 
+                );
 
                 response.Model = result.Items;
                 response.ItemsCount = result.TotalItems;

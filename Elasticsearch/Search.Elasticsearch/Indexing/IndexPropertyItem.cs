@@ -16,7 +16,36 @@ namespace Search.Elasticsearch.Indexing
 
             var res = await aClient.Indices.CreateAsync(Name, i => i
                                 .Settings(InitCommonIndexSettingsDescriptor)
-                                .Map(m => m.AutoMap<SearchablePropertyItem>())
+                                .Map(m => m
+                                    .AutoMap<SearchablePropertyItem>()
+                                    .Properties( ps => ps
+                                            .Text(p => p
+                                               .Name("Market")
+                                               .Fields(fs => fs
+                                                  .Text(f => f
+                                                      .Name("phrase")
+                                                      .Analyzer("english")
+                                                      )
+                                                   .Keyword(f => f
+                                                       .Name("keyword")
+                                                       )
+                                                   )
+                                               .Analyzer("autocomplete")
+                                               .SearchAnalyzer("autocomplete_search")
+                                                )
+                                            .Text( p => p
+                                                .Name("City")
+                                                .Fields( fs => fs
+                                                    .Text(f => f
+                                                        .Name("phrase")   
+                                                        .Analyzer("english")
+                                                        ) 
+                                                    )
+                                                .Analyzer("autocomplete")
+                                                .SearchAnalyzer("autocomplete_search")
+                                                )                                            
+                                        )
+                                    )
                 );
 
             return res;

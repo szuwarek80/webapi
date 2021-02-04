@@ -23,16 +23,16 @@ namespace Search.IndexData.Exe
                     Market="Austin",
                     State ="GS",
                     StreetAddres = "3549 Curry Lane",
-                    City = "Marietta AAA"
+                    City = "San Francesco"
                 },
                 new SearchablePropertyItem()
                 {
                     Id = 2,
-                    Name ="Forest at Columbia AAAA",
-                    StreetAddres = "1000 Merrick Ferry Road",
+                    Name ="Forest at Columbia AAAA San in Paulo",
+                    StreetAddres = "1000 Merrick Ferry Road San in Paulo",
                     Market="Austin",
                     State ="GS",
-                    City = "Marietta ZZZ"
+                    City = "San in Paulo"
                 },
                 new SearchablePropertyItem()
                 {
@@ -41,7 +41,7 @@ namespace Search.IndexData.Exe
                     StreetAddres = "nowa",
                     Market="1000 Bells Ferry Road",
                     State ="TX",
-                    City = "Marietta"
+                    City = "San Paulo"
                 },
             };
 
@@ -51,7 +51,7 @@ namespace Search.IndexData.Exe
                     {
                         Id = 1,
                         Name = "Holland Residential",
-                        Market="San Paulo",
+                        Market="San Paulo AAA",
                         State ="TX"
                     }
                 };

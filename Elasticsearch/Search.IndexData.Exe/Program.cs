@@ -27,7 +27,7 @@ namespace Search.IndexData.Exe
             //{
             //    Console.WriteLine(ex);
             //}
-            
+
             //try
             //{
             //    dataProvider.LoadProperties(@"D:\sandbox-private\GitHub\webapi\Elasticsearch\properties.json");
