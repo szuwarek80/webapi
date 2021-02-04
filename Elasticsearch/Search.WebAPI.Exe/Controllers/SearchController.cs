@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Search.Elasticsearch;
 using Search.Elasticsearch.Mapping;
-using Search.Elasticsearch.Search;
+using Search.Elasticsearch.Searching;
 using Search.WebAPI.Exe.Dto;
 
 namespace Search.WebAPI.Exe.Controllers

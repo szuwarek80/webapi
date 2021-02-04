@@ -23,13 +23,13 @@ namespace Search.IndexData.Exe
                     Market="Austin",
                     State ="GS",
                     StreetAddres = "3549 Curry Lane",
-                    City = "San Francesco"
+                    City = "San Francisco"
                 },
                 new SearchablePropertyItem()
                 {
                     Id = 2,
-                    Name ="Forest at Columbia AAAA San in Paulo",
-                    StreetAddres = "1000 Merrick Ferry Road San in Paulo",
+                    Name ="Forest at Columbia AAAA San in Paulo San Francisco",
+                    StreetAddres = "1000 Merrick Ferry Road San Francisco",
                     Market="Austin",
                     State ="GS",
                     City = "San in Paulo"

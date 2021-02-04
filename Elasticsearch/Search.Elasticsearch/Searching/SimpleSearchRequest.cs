@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 
-namespace Search.Elasticsearch.Search
+namespace Search.Elasticsearch.Searching
 {
-
     public class SimpleSearchRequest
     {
         public List<string> Indices { get; set; }

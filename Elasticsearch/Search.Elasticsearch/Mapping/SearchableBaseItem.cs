@@ -13,7 +13,7 @@ namespace Search.Elasticsearch.Mapping
         [Text(Analyzer = "autocomplete", SearchAnalyzer = "autocomplete_search", Name = nameof(Name))]
         public string Name { get; set; }
 
-        [Keyword(Name = nameof(State))]
+        [Text(Name = nameof(State))]
         public string State { get; set; }
 
         //multifieds : mapping in code

@@ -1,9 +1,7 @@
 ﻿using Search.Elasticsearch.Mapping;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Search.Elasticsearch.Search
+namespace Search.Elasticsearch.Searching
 {
     public class SimpleSerachResponse
     {

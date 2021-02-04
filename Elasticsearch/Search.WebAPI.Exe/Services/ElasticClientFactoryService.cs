@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Nest;
-using Search.Elasticsearch.Search;
+using Search.Elasticsearch.Searching;
 using System;
 
 namespace Search.WebAPI.Exe.Services

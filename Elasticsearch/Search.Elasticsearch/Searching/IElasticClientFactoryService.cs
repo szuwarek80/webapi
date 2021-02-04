@@ -1,6 +1,6 @@
 ﻿using Nest;
 
-namespace Search.Elasticsearch.Search
+namespace Search.Elasticsearch.Searching
 {
     public interface IElasticClientFactoryService
     {
