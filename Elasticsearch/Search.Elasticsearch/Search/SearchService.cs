@@ -23,14 +23,14 @@ namespace Search.Elasticsearch.Search
         public async Task<SimpleSerachResponse> Search(SimpleSearchRequest aSearchRequest)
         {
             BoolQuery filterQuery = new BoolQuery();
-            if (!string.IsNullOrEmpty(aSearchRequest.Filter))
+            if (!string.IsNullOrEmpty(aSearchRequest.MarketFilterQuery))
             {
                 var filterQueryParts = new List<QueryContainer>();
                 filterQueryParts.Add(
                     new MatchQuery()
                     {
                         Field = $"{nameof(SearchableBaseItem.Market)}",
-                        Query = aSearchRequest.Filter.ToLower(),
+                        Query = aSearchRequest.MarketFilterQuery.ToLower(),
                         Fuzziness = Fuzziness.Auto
                     }
                 );
@@ -41,11 +41,10 @@ namespace Search.Elasticsearch.Search
             var results = await _client.SearchAsync<SearchableBaseItem>(s => s
                   .Size(aSearchRequest.PageSize)
                   .Skip(aSearchRequest.PageStartIndex)
-                  .Index(Indices.Index(aSearchRequest.Indices))
-                  
+                  .Index(Indices.Index(aSearchRequest.Indices))                  
                   .Query(q => q   
                       .MultiMatch(m => m
-                                 .Query(aSearchRequest.Query.ToLower())
+                                 .Query(aSearchRequest.AllStringFiledsQuery.ToLower())
                                  .Fields(ff => ff                                        
                                         .Field($"{nameof(SearchableBaseItem.Name)}")
                                         .Field($"{nameof(SearchableBaseItem.Market)}")

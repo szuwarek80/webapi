@@ -1,13 +1,6 @@
 ﻿using Nest;
-using Newtonsoft.Json;
 using Search.Elasticsearch.Indexing;
-using Search.Elasticsearch.Mapping;
-using Search.WebAPI.Exe.Dto;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using static Search.IndexData.Exe.DataProvider;
 
 namespace Search.IndexData.Exe
 {

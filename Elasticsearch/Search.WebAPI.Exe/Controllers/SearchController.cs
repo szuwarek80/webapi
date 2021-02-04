@@ -36,18 +36,8 @@ namespace Search.WebAPI.Exe.Controllers
                 {
                     PageSize = aRequest.PageSize,
                     PageStartIndex = aRequest.PageStartIndex,
-                    Query = aRequest.Phase,
-                    QueryFields = new List<string>() 
-                    { 
-                        nameof(SearchableBaseItem.Name), 
-                        nameof(SearchableBaseItem.Market), 
-                        nameof(SearchableBaseItem.State),
-                        nameof(SearchablePropertyItem.FormerName),
-                        nameof(SearchablePropertyItem.StreetAddres),
-                        nameof(SearchablePropertyItem.City)
-                    },
-                    Filter = aRequest.Market,
-                    FilterFields = new List<string>() { nameof(SearchableBaseItem.Market) },
+                    AllStringFiledsQuery = aRequest.Phase,
+                    MarketFilterQuery = aRequest.Market,
                     Indices = new List<string>() { Config.IndexPropertyItemName, Config.IndexManagementItemName }
                 }
                 ); 

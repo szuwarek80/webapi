@@ -48,12 +48,12 @@ namespace Search.Elasticsearch.Indexing
         {
             return analysis.Analyzers(a => a
                 .Custom("autocomplete", ca => ca
-                    .Filters("eng_stopwords", "trim", "lowercase")
                     .Tokenizer("autocomplete")
+                    .Filters("stopwords_eng", "trim", "lowercase")
                 )
                 .Custom("autocomplete_search", ca => ca
-                   .Filters("eng_stopwords", "trim", "lowercase")
-                   .Tokenizer("lowercase")
+                   .Tokenizer("standard")
+                   .Filters("stopwords_eng", "trim", "lowercase")
                 )
             )
             .Tokenizers(tdesc => tdesc               
@@ -64,7 +64,7 @@ namespace Search.Elasticsearch.Indexing
                 )
             )
             .TokenFilters(f => f                
-                .Stop("eng_stopwords", lang => lang                    
+                .Stop("stopwords_eng", lang => lang                    
                     .StopWords("_english_")
                 )
             );

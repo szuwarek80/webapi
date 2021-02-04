@@ -1,10 +1,5 @@
-﻿using Nancy.Json;
-using Newtonsoft.Json;
-using RestSharp;
-using Search.Elasticsearch.Indexing;
+﻿using Search.Elasticsearch.Indexing;
 using Search.Elasticsearch.Mapping;
-using Search.WebAPI.Exe.Dto;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -24,26 +19,29 @@ namespace Search.IndexData.Exe
                 new SearchablePropertyItem()
                 {
                     Id= 1,
-                    Name ="My granny has a wooden  super chair",
-                    StreetAddres = "test",
+                    Name ="Forest at Columbia",
                     Market="Austin",
-                    State ="GS"
+                    State ="GS",
+                    StreetAddres = "3549 Curry Lane",
+                    City = "Marietta AAA"
                 },
                 new SearchablePropertyItem()
                 {
                     Id = 2,
-                    Name ="prop2",
-                    StreetAddres = "nowa",
+                    Name ="Forest at Columbia AAAA",
+                    StreetAddres = "1000 Merrick Ferry Road",
                     Market="Austin",
-                    State ="GS"
+                    State ="GS",
+                    City = "Marietta ZZZ"
                 },
                 new SearchablePropertyItem()
                 {
                     Id = 3,
-                    Name ="prop3",
+                    Name ="Forest AAA Columbia",
                     StreetAddres = "nowa",
-                    Market="San Francisco",
-                    State ="CA"
+                    Market="1000 Bells Ferry Road",
+                    State ="TX",
+                    City = "Marietta"
                 },
             };
 
@@ -52,7 +50,7 @@ namespace Search.IndexData.Exe
                     new SearchableManagementItem()
                     {
                         Id = 1,
-                        Name = "Company A",
+                        Name = "Holland Residential",
                         Market="San Paulo",
                         State ="TX"
                     }

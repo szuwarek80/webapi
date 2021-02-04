@@ -7,19 +7,17 @@ namespace Search.Elasticsearch.Mapping
     {
         public const string TypeName = "searchablepropertyitem";
 
-        [Text(/*Analyzer = "autocomplete", */Name = nameof(FormerName))]
+        [Text(Analyzer = "autocomplete", SearchAnalyzer = "autocomplete_search", Name = nameof(FormerName))]
         public string FormerName { get; set; }
 
-        [Text(/*Analyzer = "autocomplete", */Name = nameof(StreetAddres))]
+        [Text(Analyzer = "autocomplete", SearchAnalyzer = "autocomplete_search", Name = nameof(StreetAddres))]
         public string StreetAddres { get; set; }
 
-        [Text(/*Analyzer = "autocomplete", */Name = nameof(City))]
+        [Text(Analyzer = "autocomplete", SearchAnalyzer = "autocomplete_search", Name = nameof(City))]
         public string City { get; set; }
 
-        //[Text(Name=nameof(Lat))]
         public float Lat { get; set; }
 
-        //[Text(Name = nameof(Lng))]        
         public float Lng { get; set; }
     }
 }
