@@ -7,13 +7,12 @@ namespace Search.Elasticsearch.Search
 {
     public interface ISearchService
     {
-        Task<ISearchResponse<SearchableBaseItem>> Search(SimpleSearchRequest aSearchRequest);
+        Task<SimpleSerachResponse> Search(SimpleSearchRequest aSearchRequest);
     }
 
     public class SearchService :
         ISearchService
     {
-
         private IElasticClient _client;
 
         public SearchService(IElasticClientFactoryService aElasticClientFactoryService)
@@ -21,17 +20,19 @@ namespace Search.Elasticsearch.Search
             _client = aElasticClientFactoryService.CreateElasticClient();
         }
 
-        public async Task<ISearchResponse<SearchableBaseItem>> Search(SimpleSearchRequest aSearchRequest)
+        public async Task<SimpleSerachResponse> Search(SimpleSearchRequest aSearchRequest)
         {
             BoolQuery filterQuery = new BoolQuery();
             if (!string.IsNullOrEmpty(aSearchRequest.Filter))
             {
                 var filterQueryParts = new List<QueryContainer>();
-                filterQueryParts.Add(new MatchQuery()
-                {
-                    Field = $"{nameof(SearchableBaseItem.Market)}",
-                    Query = aSearchRequest.Filter
-                }
+                filterQueryParts.Add(
+                    new MatchQuery()
+                    {
+                        Field = $"{nameof(SearchableBaseItem.Market)}",
+                        Query = aSearchRequest.Filter.ToLower(),
+                        Fuzziness = Fuzziness.Auto
+                    }
                 );
 
                 filterQuery.Filter = filterQueryParts;
@@ -41,10 +42,11 @@ namespace Search.Elasticsearch.Search
                   .Size(aSearchRequest.PageSize)
                   .Skip(aSearchRequest.PageStartIndex)
                   .Index(Indices.Index(aSearchRequest.Indices))
+                  
                   .Query(q => q   
                       .MultiMatch(m => m
-                                 .Query(aSearchRequest.Query)
-                                 .Fields(ff => ff
+                                 .Query(aSearchRequest.Query.ToLower())
+                                 .Fields(ff => ff                                        
                                         .Field($"{nameof(SearchableBaseItem.Name)}")
                                         .Field($"{nameof(SearchableBaseItem.Market)}")
                                         .Field($"{nameof(SearchableBaseItem.State)}")
@@ -52,12 +54,17 @@ namespace Search.Elasticsearch.Search
                                         .Field($"{nameof(SearchablePropertyItem.StreetAddres)}")
                                         .Field($"{nameof(SearchablePropertyItem.City)}")
                                         )
-                                  )
+                                  //.Fuzziness(Fuzziness.Auto)
+                                  )                       
                         && filterQuery
-                      )
+                      )                      
                   ); 
 
-            return results;
-          }       
+            return new SimpleSerachResponse()
+            { 
+                TotalItems = results.Total,
+                Items = results.Documents
+            };
+        }       
     }
 }

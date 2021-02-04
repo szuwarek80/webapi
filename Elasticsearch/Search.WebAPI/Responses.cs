@@ -23,7 +23,7 @@ namespace Search.WebAPI
 
     public interface IPagedResponse<TModel> : IListResponse<TModel>
     {
-        int ItemsCount { get; set; }
+        long ItemsCount { get; set; }
 
         double PageCount { get; }
     }
@@ -70,11 +70,11 @@ namespace Search.WebAPI
 
         public IEnumerable<TModel> Model { get; set; }
 
-        public int PageSize { get; set; }
+        public long PageSize { get; set; }
 
-        public int PageNumber { get; set; }
+        public long PageNumber { get; set; }
 
-        public int ItemsCount { get; set; }
+        public long ItemsCount { get; set; }
 
         public double PageCount
             => ItemsCount < PageSize ? 1 : (int)(((double)ItemsCount / PageSize) + 1);

@@ -41,41 +41,34 @@ namespace Search.Elasticsearch.Indexing
             return aDescriptor
                 .NumberOfReplicas(0)
                 .NumberOfShards(1)
-               /* .Analysis(InitCommonAnalyzers)*/;
+                .Analysis(InitCommonAnalyzers);
         }
 
-        //protected static IAnalysis InitCommonAnalyzers(AnalysisDescriptor analysis)
-        //{
-        //    return analysis.Analyzers(a => a
-        //        .Custom("html_stripper", cc => cc
-        //            .Filters("eng_stopwords", "trim", "lowercase")
-        //            .CharFilters("html_strip")
-        //            .Tokenizer("autocomplete")
-        //        )
-        //        .Custom("keywords_wo_stopwords", cc => cc
-        //            .Filters("eng_stopwords", "trim", "lowercase")
-        //            .CharFilters("html_strip")
-        //            .Tokenizer("key_tokenizer")
-        //        )
-        //        .Custom("autocomplete", cc => cc
-        //            .Filters("eng_stopwords", "trim", "lowercase")
-        //            .Tokenizer("autocomplete")
-        //        )
-        //    )
-        //    .Tokenizers(tdesc => tdesc
-        //        .Keyword("key_tokenizer", t => t)
-        //        .EdgeNGram("autocomplete", e => e
-        //            .MinGram(3)
-        //            .MaxGram(15)
-        //            .TokenChars(TokenChar.Letter, TokenChar.Digit)
-        //        )
-        //    )
-        //    .TokenFilters(f => f
-        //        .Stop("eng_stopwords", lang => lang
-        //            .StopWords("_english_")
-        //        )
-        //    );
-        //}
+        protected static IAnalysis InitCommonAnalyzers(AnalysisDescriptor analysis)
+        {
+            return analysis.Analyzers(a => a
+                .Custom("autocomplete", ca => ca
+                    .Filters("eng_stopwords", "trim", "lowercase")
+                    .Tokenizer("autocomplete")
+                )
+                .Custom("autocomplete_search", ca => ca
+                   .Filters("eng_stopwords", "trim", "lowercase")
+                   .Tokenizer("lowercase")
+                )
+            )
+            .Tokenizers(tdesc => tdesc               
+                .EdgeNGram("autocomplete", e => e
+                    .MinGram(3)
+                    .MaxGram(15)
+                    .TokenChars(TokenChar.Letter, TokenChar.Digit)
+                )
+            )
+            .TokenFilters(f => f                
+                .Stop("eng_stopwords", lang => lang                    
+                    .StopWords("_english_")
+                )
+            );
+        }
 
     }
 }

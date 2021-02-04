@@ -21,6 +21,7 @@ namespace Search.WebAPI.Exe.Services
             var node = new Uri(_configuration["AWSES:URL"]);
             var settings = new ConnectionSettings(node)
                             .BasicAuthentication(_configuration["AWSES:User"], _configuration["AWSES:Pwd"]);
+            settings.ThrowExceptions(alwaysThrow: true);
             settings.DisableDirectStreaming();
 
             return new ElasticClient(settings);

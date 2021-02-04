@@ -1,6 +1,13 @@
 ﻿using Nest;
+using Newtonsoft.Json;
 using Search.Elasticsearch.Indexing;
+using Search.Elasticsearch.Mapping;
+using Search.WebAPI.Exe.Dto;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using static Search.IndexData.Exe.DataProvider;
 
 namespace Search.IndexData.Exe
 {
@@ -12,16 +19,30 @@ namespace Search.IndexData.Exe
 
         static void Main(string[] args)
         {
-
             var node = new Uri(AWSESUri);
             var settings = new ConnectionSettings(node).BasicAuthentication(AWSESUser, AWSESPwd);
             settings.DisableDirectStreaming();
 
             var client = new ElasticClient(settings);
 
-            DataProvider dataProvider = new DataProvider(
-                @"D:\sandbox-private\GitHub\webapi\Elasticsearch\properties.json",
-                @"D:\sandbox-private\GitHub\webapi\Elasticsearch\mgmt.json");
+            DataProvider dataProvider = new DataProvider();
+            //try
+            //{
+            //    dataProvider.LoadManagemetns(@"D:\sandbox-private\GitHub\webapi\Elasticsearch\mgmt.json");
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex);
+            //}
+            
+            //try
+            //{
+            //    dataProvider.LoadProperties(@"D:\sandbox-private\GitHub\webapi\Elasticsearch\properties.json");
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex);
+            //}
 
             IndexPropertyItem indexPropertyItem = new IndexPropertyItem();
             var resCreate = indexPropertyItem.CreateIndex(client).Result;
@@ -30,12 +51,6 @@ namespace Search.IndexData.Exe
             IndexManagementItem indexManagementItem = new IndexManagementItem();
             resCreate = indexManagementItem.CreateIndex(client).Result;
             resInsert = indexManagementItem.InsertDataIntoIndex(client, dataProvider).Result;
-
-            //SearchService searchService = new SearchService(client);
-            //searchService.Search(new CommonSearchRequest()
-            //{
-            //    Query = "test"
-            //}, new List<Elasticsearch.Core.Indexing.IndexBaseItem>() { propertyIndexer, managementIndex });
 
         }
     }

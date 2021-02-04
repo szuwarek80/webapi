@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Search.Elasticsearch;
+using Search.Elasticsearch.Mapping;
 using Search.Elasticsearch.Search;
 using Search.WebAPI.Exe.Dto;
 
@@ -23,7 +24,7 @@ namespace Search.WebAPI.Exe.Controllers
             _searchSevice = aSerachService;
         }
 
-        [HttpGet("{aQuery}")]
+        [HttpGet]
         public async Task<IActionResult> Search(SearchCriteriaDto aRequest)
         {
             _logger?.LogDebug("'{0}' has been invoked", nameof(SearchController));
@@ -32,16 +33,29 @@ namespace Search.WebAPI.Exe.Controllers
             try
             {
                 var result = await _searchSevice.Search(new SimpleSearchRequest()
-                    {
-                        PageSize = aRequest.PageSize,
-                        PageStartIndex = aRequest.PageStartIndex,
-                        Query = aRequest.Phase,
-                        Filter = aRequest.Market,
-                        Indices = new List<string>() { Config.IndexPropertyItemName, Config.IndexManagementItemName }
-                    }
-                );
-                
-                response.Model = result.Documents;
+                {
+                    PageSize = aRequest.PageSize,
+                    PageStartIndex = aRequest.PageStartIndex,
+                    Query = aRequest.Phase,
+                    QueryFields = new List<string>() 
+                    { 
+                        nameof(SearchableBaseItem.Name), 
+                        nameof(SearchableBaseItem.Market), 
+                        nameof(SearchableBaseItem.State),
+                        nameof(SearchablePropertyItem.FormerName),
+                        nameof(SearchablePropertyItem.StreetAddres),
+                        nameof(SearchablePropertyItem.City)
+                    },
+                    Filter = aRequest.Market,
+                    FilterFields = new List<string>() { nameof(SearchableBaseItem.Market) },
+                    Indices = new List<string>() { Config.IndexPropertyItemName, Config.IndexManagementItemName }
+                }
+                ); 
+
+                response.Model = result.Items;
+                response.ItemsCount = result.TotalItems;
+                response.PageSize = aRequest.PageSize;
+                response.PageNumber = aRequest.PageStartIndex / aRequest.PageSize;
 
                 _logger?.LogInformation("Trasnfer '{0}' has been started", response.Model);
             }

@@ -16,10 +16,10 @@ namespace Search.Elasticsearch.Mapping
         [Text(/*Analyzer = "autocomplete", */Name = nameof(City))]
         public string City { get; set; }
 
-        [Text(Name=nameof(Lat))]
-        public string Lat { get; set; }
+        //[Text(Name=nameof(Lat))]
+        public float Lat { get; set; }
 
-        [Text(Name = nameof(Lng))]        
-        public string Lng { get; set; }
+        //[Text(Name = nameof(Lng))]        
+        public float Lng { get; set; }
     }
 }
