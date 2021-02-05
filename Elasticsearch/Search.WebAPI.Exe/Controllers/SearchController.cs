@@ -27,34 +27,44 @@ namespace Search.WebAPI.Exe.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(SearchCriteriaDto aRequest)
         {
-            _logger?.LogDebug("'{0}' has been invoked", nameof(SearchController));
+            _logger?.LogDebug("'{0}:{1}' has been invoked", nameof(SearchController), nameof(Search));
 
             var response = new PagedResponse<SearchableBaseItem>();
             try
             {
-                var result = await _searchSevice.Search(new SimpleSearchRequest()
+                if (aRequest.Validate(out var validateError))
                 {
-                    PageSize = aRequest.PageSize,
-                    PageStartIndex = aRequest.PageStartIndex,
-                    AllStringFiledsQuery = aRequest.Phase,
-                    MarketFilterQuery = aRequest.Market,
-                    Indices = new List<string>() { Config.IndexPropertyItemName, Config.IndexManagementItemName }
+                    var result = await _searchSevice.Search(new SimpleSearchRequest()
+                    {
+                        PageSize = aRequest.PageSize,
+                        PageStartIndex = aRequest.PageStartIndex,
+                        AllStringFiledsQuery = aRequest.Phase,
+                        MarketFilterQuery = aRequest.Market,
+                        Indices = new List<string>() { Config.IndexPropertyItemName, Config.IndexManagementItemName }
+                    }
+                    );
+
+                    response.Model = result.Items;
+                    response.ItemsCount = result.TotalItems;
+                    response.PageSize = aRequest.PageSize;
+                    response.PageNumber = aRequest.PageStartIndex / aRequest.PageSize;
+
+                    _logger?.LogInformation("'{0}:{1}' ResultsCount{2}", nameof(SearchController), nameof(Search), result.Items.Count);
                 }
-                );
+                else
+                {
+                    response.HasError = true;
+                    response.ErrorMessage = validateError;
 
-                response.Model = result.Items;
-                response.ItemsCount = result.TotalItems;
-                response.PageSize = aRequest.PageSize;
-                response.PageNumber = aRequest.PageStartIndex / aRequest.PageSize;
-
-                _logger?.LogInformation("Trasnfer '{0}' has been started", response.Model);
+                    _logger?.LogCritical("There was an error on ''{0}:{1}' invocation: {2}", nameof(SearchController), nameof(Search), validateError);
+                }
             }
             catch (Exception ex)
             {
                 response.HasError = true;
                 response.ErrorMessage = "There was an internal error, please contact to technical support.";
 
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(SearchController), ex);
+                _logger?.LogCritical("There was an error on ''{0}:{1}' invocation: {2}", nameof(SearchController), nameof(Search), ex);
             }
             return response.ToHttpResponse();
         }

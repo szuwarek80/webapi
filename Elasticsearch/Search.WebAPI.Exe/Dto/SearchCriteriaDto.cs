@@ -17,5 +17,16 @@ namespace Search.WebAPI.Exe.Dto
             this.PageSize = 25;
             this.PageStartIndex = 0;
         }
+
+        public bool Validate(out string aError)
+        {
+            aError = null;
+            var ret = !String.IsNullOrEmpty(this.Phase);
+            if (!ret)
+            {
+                aError = "'Phase' cannot be empty";
+            }
+            return ret;
+        }
     }
 }
