@@ -21,11 +21,7 @@ namespace Search.Elasticsearch.Indexing
                                   .Properties(ps => ps
                                          .Text(p => p
                                             .Name("Market")
-                                            .Fields(fs => fs
-                                               .Text(f => f
-                                                   .Name("phrase")
-                                                   .Analyzer("english")
-                                                   )
+                                            .Fields(fs => fs                                              
                                                .Keyword(f => f
                                                    .Name("keyword")                                                   
                                                    )
