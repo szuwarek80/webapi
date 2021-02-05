@@ -57,11 +57,11 @@ namespace Search.Elasticsearch.Indexing
                     )
                 .Custom("keyword_list_serach", ca => ca
                     .Tokenizer("split_list")
-                    .Filters("stopwords_eng", "trim")
+                    .Filters("trim")
                     )
                 .Custom("shingle_serach", ca => ca
                     .Tokenizer("whitespace")
-                    .Filters("shingle")
+                    .Filters("shingle", "trim")
                     )
             )
             .Tokenizers(tdesc => tdesc               

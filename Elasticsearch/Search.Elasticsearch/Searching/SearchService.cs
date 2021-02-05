@@ -32,21 +32,12 @@ namespace Search.Elasticsearch.Searching
                   .Size(aSearchRequest.PageSize)
                   .Skip(aSearchRequest.PageStartIndex)
                   .Index(Indices.Index(aSearchRequest.Indices))
-                  .Query(q => q
-                        /*
-                          .Match( x => x
-                              .Query(aSearchRequest.AllStringFiledsQuery)
-                              .Field("City.keyword")
-                              .Analyzer("shingle_serach")
-                          )
-                        */
-
+                  .Query(q => q                        
                         .Bool(b => b
                           .Should(
-                            // for City and Market a 'phrase' field is created, which allowes 
-                            // to better place the item in result when the city/market was put as the AllStringFiledsQuery
-                            // e.g. if someone put the AllStringFiledsQuery="San Francisco" ...
-                            // but this match will not work in case of putting the AllStringFiledsQuery="San Francisco properties" 
+                            // for City and Market a 'keyword' field is created, which allowes 
+                            // to better place the item in case when the proper (exact match) city/market was put int the AllStringFiledsQuery
+                            // e.g. if someone put the AllStringFiledsQuery="San Francisco properties" ...
                             bs => bs.MultiMatch(x => x
                                         .Query(aSearchRequest.AllStringFiledsQuery)
                                         .Fields(ff => ff
