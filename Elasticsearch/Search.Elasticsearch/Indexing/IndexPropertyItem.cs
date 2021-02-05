@@ -36,10 +36,13 @@ namespace Search.Elasticsearch.Indexing
                                             .Text( p => p
                                                 .Name("City")
                                                 .Fields( fs => fs
-                                                    .Text(f => f
+                                                   .Text(f => f
                                                         .Name("phrase")   
                                                         .Analyzer("english")
-                                                        ) 
+                                                        )
+                                                   .Keyword(f => f
+                                                       .Name("keyword")
+                                                       )
                                                     )
                                                 .Analyzer("autocomplete")
                                                 .SearchAnalyzer("autocomplete_search")

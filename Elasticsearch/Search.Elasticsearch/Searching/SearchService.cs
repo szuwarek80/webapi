@@ -31,45 +31,54 @@ namespace Search.Elasticsearch.Searching
             var results = await _client.SearchAsync<JsonObject>(s => s
                   .Size(aSearchRequest.PageSize)
                   .Skip(aSearchRequest.PageStartIndex)
-                  .Index(Indices.Index(aSearchRequest.Indices))                    
+                  .Index(Indices.Index(aSearchRequest.Indices))
                   .Query(q => q
-                      .Bool(b => b
-                        .Should(
-                          // for City and Market a 'phrase' field is created, which allowes 
-                          // to better place the item in result when the city/market was put as the AllStringFiledsQuery
-                          // e.g. if someone put the AllStringFiledsQuery="San Francisco" ...
-                          // but this match will not work in case of putting the AllStringFiledsQuery="San Francisco properties" 
-                          bs => bs.MatchPhrase(x => x
-                                      .Query(aSearchRequest.AllStringFiledsQuery.ToLower())
-                                      .Field("City.phrase")
-                              ),
-                          bs => bs.MatchPhrase(x => x
-                                      .Query(aSearchRequest.AllStringFiledsQuery.ToLower())
-                                      .Field("Market.phrase")
-                              )
+                        /*
+                          .Match( x => x
+                              .Query(aSearchRequest.AllStringFiledsQuery)
+                              .Field("City.keyword")
+                              .Analyzer("shingle_serach")
                           )
-                        .Must(
-                          // we search all text fields with the AllStringFiledsQuery                          
-                          // Name, Market, FormerName, StreetAdress, City text field uses:
-                          //        'autocomplete' analyzer when indexing data
-                          //        'autocomplete_search' analyzer when searching
-                          //        both analyzers are crated on index creation
-                          bs => bs.MultiMatch( m => m
-                                         .Query(aSearchRequest.AllStringFiledsQuery.ToLower())
-                                         .Fields(ff => ff
-                                                .Field($"{nameof(SearchableBaseItem.Name)}")
-                                                .Field($"{nameof(SearchableBaseItem.Market)}")
-                                                .Field($"{nameof(SearchableBaseItem.State)}")
-                                                .Field($"{nameof(SearchablePropertyItem.FormerName)}")
-                                                .Field($"{nameof(SearchablePropertyItem.StreetAddres)}")
-                                                .Field($"{nameof(SearchablePropertyItem.City)}")
-                                                )                                          
-                                          .Fuzziness(Fuzziness.Auto)
-                                          ),
-                          bs => filterQuery
-                              )
-                         )                      
-                      )                   
+                        */
+
+                        .Bool(b => b
+                          .Should(
+                            // for City and Market a 'phrase' field is created, which allowes 
+                            // to better place the item in result when the city/market was put as the AllStringFiledsQuery
+                            // e.g. if someone put the AllStringFiledsQuery="San Francisco" ...
+                            // but this match will not work in case of putting the AllStringFiledsQuery="San Francisco properties" 
+                            bs => bs.MultiMatch(x => x
+                                        .Query(aSearchRequest.AllStringFiledsQuery)
+                                        .Fields(ff => ff
+                                            .Field("City.keyword")
+                                            .Field("Market.keyword")
+                                        )
+                                        .Analyzer("shingle_serach")
+                                )
+                            )
+                          
+                          .Must(
+                            // we search all text fields with the AllStringFiledsQuery                          
+                            // Name, Market, FormerName, StreetAdress, City text field uses:
+                            //        'autocomplete' analyzer when indexing data
+                            //        'autocomplete_search' analyzer when searching
+                            //        both analyzers are crated on index creation
+                            bs => bs.MultiMatch( m => m
+                                           .Query(aSearchRequest.AllStringFiledsQuery.ToLower())
+                                           .Fields(ff => ff
+                                                  .Field($"{nameof(SearchableBaseItem.Name)}")
+                                                  .Field($"{nameof(SearchableBaseItem.Market)}")
+                                                  .Field($"{nameof(SearchableBaseItem.State)}")
+                                                  .Field($"{nameof(SearchablePropertyItem.FormerName)}")
+                                                  .Field($"{nameof(SearchablePropertyItem.StreetAddres)}")
+                                                  .Field($"{nameof(SearchablePropertyItem.City)}")
+                                                  )                                          
+                                            .Fuzziness(Fuzziness.Auto)
+                                            ),
+                            bs => filterQuery
+                                )                        
+                         )                    
+                      )
                   );
 
             return new SimpleSerachResponse()

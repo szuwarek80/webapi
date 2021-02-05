@@ -59,6 +59,10 @@ namespace Search.Elasticsearch.Indexing
                     .Tokenizer("split_list")
                     .Filters("stopwords_eng", "trim")
                     )
+                .Custom("shingle_serach", ca => ca
+                    .Tokenizer("whitespace")
+                    .Filters("shingle")
+                    )
             )
             .Tokenizers(tdesc => tdesc               
                 .EdgeNGram("autocomplete", e => e
